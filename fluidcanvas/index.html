@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>HTML5 Canvas Fluid Simulation</title>
+    <!-- <link href='//fonts.googleapis.com/css?family=Michroma'
+    rel='stylesheet' type='text/css'> -->
+    <!-- <link rel="stylesheet" href="style.css" /> -->
+  </head>
+<body>
+<div id="header">
+  <h1><a href="//29a.ch/">29a.ch</a></h1>
+  <p><a href="//29a.ch/2012/11/5/html-5-canvas-fluid-simulation/">More about this experiment</a></p>&nbsp;&nbsp;&nbsp;
+  <p><a href="//29a.ch/experiments/">More Experiments &amp; Toys</a></p>
+  <div id="social">
+  </div>
+</div>
+<div id=content>
+<canvas id="c" width=128 height=128 style="width:512px;height:512px;float: left;"></canvas>
+<div><p>
+    This is a simplistic fluid simulation based on the <a href="http://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations">navier stokes equations</a> using the HTML5 Canvas element.
+    I created it to make sure I understood the concepts involved well enough before starting the WebGL implementation.
+    I hope that the result of this experiments will lead to a successor to my (quite popular) <a href=/sandbox/2011/neonflames>Neon Flames</a> experiment.</p>
+<p>
+    <span style=color:#c00;>If you want to have some fun</span> apply some pressure to one of the corners of the canvas.
+    It will send the entire simulation on a <em>acid trip</em>. ;)
+    </p>
+    <p>This happens because I do not enforce the boundary conditions in the solver.
+    Of course I did this on purpose for speed and this trippy effect. ;)</p>
+</div>
+</div>
+<p style=clear:both;margin:8px;color:#666>by <a href="https://29a.ch">Jonas Wagner</a></p>
+<script src=fluid.js></script>
+<script src=a.js async></script>
+</body>
+</html>
