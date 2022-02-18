@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head lang="en">
+    <meta charset="UTF-8" />
+    <title>Der Schmale - GPU SPH Fluid simulation</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+    <!-- COMMON TAGS -->
+    <meta charset="utf-8" />
+    <title>Der Schmale - GPU SPH Fluid simulation</title>
+    <!-- Search Engine -->
+    <meta name="description" content="GPU SPH Fluid simulation with volumetric lighting" />
+    <!-- Schema.org for Google -->
+    <meta itemprop="name" content="Der Schmale - GPU SPH Fluid simulation" />
+    <meta itemprop="description" content="GPU SPH Fluid simulation with volumetric lighting" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Der Schmale - GPU SPH Fluid simulation" />
+    <meta name="twitter:description" content="GPU SPH Fluid simulation with volumetric lighting" />
+    <meta name="twitter:site" content="@DerSchmale" />
+    <meta name="twitter:creator" content="@DerSchmale" />
+    <meta name="twitter:image:src" content="http://www.derschmale.com/lab/doodles/sph/sph.jpg" />
+    <!-- Open Graph general (Facebook, Pinterest & Google+) -->
+    <meta name="og:title" content="Der Schmale - GPU SPH Fluid simulation" />
+    <meta name="og:description" content="GPU SPH Fluid simulation with volumetric lighting" />
+    <meta name="og:image" content="https://www.derschmale.com/lab/doodles/sph/sph.jpg" />
+    <meta name="og:url" content="https://www.derschmale.com/lab/doodles/sph/" />
+    <meta name="og:site_name" content="Der Schmale - GPU SPH Fluid simulation" />
+    <meta name="fb:admins" content="100004522787607" />
+    <meta name="fb:app_id" content="2018591138383275" />
+    <meta name="og:type" content="website" />
+
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
+    <script src="three.min.js"></script>
+    <script src="stats.min.js"></script>
+  </head>
+  <body id="rootBody">
+    <script src="sph.js"></script>
+    <div id="webglcontainer"></div>
+    <div id="preloader" class="preloader">
+      <div id="preloaderBar" class="vAligned">
+        Loading...
+        <div class="preloaderBorder">
+          <div id="preloaderProgress" class="preloaderProgress"></div>
+        </div>
+      </div>
+    </div>
+    <div id="errorContainer" class="vAligned hidden">
+      <h1>Sorry!</h1>
+      <p id="errorMessage"></p>
+    </div>
+    <div id="playContainer" class="vAligned hidden">
+      <h2>SPH Fluid simulation with volumetric rendering</h2>
+      <p>Choose quality.</p>
+      <p>Warning: Beefy computer required.</p>
+      <h3>Ball:</h3>
+      <p>
+        <a href="javascript:start(SPH.Quality.LOW, SPHContent.BALL_MODE)">low</a> | <a href="javascript:start(SPH.Quality.HIGH, SPHContent.BALL_MODE)">high</a> |
+        <a href="javascript:start(SPH.Quality.EXTREME, SPHContent.BALL_MODE)">extreme</a>
+      </p>
+      <h3>Jelly cascade:</h3>
+      <p>
+        <a href="javascript:start(SPH.Quality.LOW, SPHContent.CASCADE_MODE)">low</a> | <a href="javascript:start(SPH.Quality.HIGH, SPHContent.CASCADE_MODE)">high</a> |
+        <a href="javascript:start(SPH.Quality.EXTREME, SPHContent.CASCADE_MODE)">extreme</a>
+      </p>
+    </div>
+    <div id="info" class="infoField hidden">
+      <p>
+        SPH fluid simulation on GPU<br />
+        With volumetric rendering
+      </p>
+      <p>Click + drag - Look around / drag ball</p>
+      <p>Made with <a href="https://threejs.org/" target="_blank">three.js</a></p>
+      <p>- David Lenaerts (<a href="https://derschmale.com">derschmale.com</a>)</p>
+    </div>
+  </body>
+</html>
