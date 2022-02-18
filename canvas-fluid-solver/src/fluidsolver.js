@@ -51,8 +51,8 @@
     // But I haven't seen any significant improvement on Chrome because V8 probably does it on its own.
 
     // Values for current simulation step
-    this.u = new Array(this.numOfCells); // Velocity x, 速度
-    this.v = new Array(this.numOfCells); // Velocity y, 速度
+    this.u = new Array(this.numOfCells); // Velocity x, 速度x
+    this.v = new Array(this.numOfCells); // Velocity y, 速度y
     this.d = new Array(this.numOfCells); // Density,密度
 
     // Values from the last simulation step

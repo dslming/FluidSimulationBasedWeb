@@ -20,6 +20,7 @@
 
 [WebGL-SPH2D](https://lightsteelblue.github.io/WebGL-SPH2D/)
 
+[流体模拟器webgl](https://github.com/portsmouth/Trinity)
 ### doc
 
 [Fluid Simulation (with WebGL demo)](http://jamie-wong.com/2016/08/05/webgl-fluid-simulation/)
@@ -29,3 +30,5 @@
 [fluids_notes.pdf](https://www.cs.ubc.ca/~rbridson/fluidsimulation/fluids_notes.pdf)
 
 [navier-stokes-fluid-simulation-on-html5-canvas](https://www.esimov.com/2014/01/navier-stokes-fluid-simulation-on-html5-canvas#.Yg5h9ZNBwV8)
+
+[Gentle Introduction to Realtime Fluid Simulation for Programmers and Technical Artists](https://shahriyarshahrabi.medium.com/gentle-introduction-to-fluid-simulation-for-programmers-and-technical-artists-7c0045c40bac)
