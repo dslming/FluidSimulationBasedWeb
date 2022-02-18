@@ -18,6 +18,8 @@
 
 [canvas-fluid-solver](https://github.com/topaz1008/canvas-fluid-solver)
 
+[WebGL-SPH2D](https://lightsteelblue.github.io/WebGL-SPH2D/)
+
 ### doc
 
 [Fluid Simulation (with WebGL demo)](http://jamie-wong.com/2016/08/05/webgl-fluid-simulation/)
