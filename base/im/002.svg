@@ -1,0 +1,240 @@
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="46.718ex" height="16.676ex" style="vertical-align: -9.005ex;" viewBox="0 -3302.9 20114.6 7179.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">{\displaystyle \quad \overbrace {\rho {\Big (}\underbrace {\frac {\partial \mathbf {v} }{\partial t}} _{\begin{smallmatrix}{\text{非 稳 态}}\\{\text{加 速}}\end{smallmatrix}}+\underbrace {(\mathbf {v} \cdot \nabla )\mathbf {v} } _{\begin{smallmatrix}{\text{对 流}}\\{\text{加 速}}\end{smallmatrix}}{\Big )}} ^{\text{惯 性}}=\underbrace {-\nabla p} _{\begin{smallmatrix}{\text{压 强}}\\{\text{梯 度}}\end{smallmatrix}}+\underbrace {\mu \nabla ^{2}\mathbf {v} } _{\text{黏 滞 力}}+\underbrace {\mathbf {f} } _{\begin{smallmatrix}{\text{其 他 力}}\end{smallmatrix}}}</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-3C1" d="M58 -216Q25 -216 23 -186Q23 -176 73 26T127 234Q143 289 182 341Q252 427 341 441Q343 441 349 441T359 442Q432 442 471 394T510 276Q510 219 486 165T425 74T345 13T266 -10H255H248Q197 -10 165 35L160 41L133 -71Q108 -168 104 -181T92 -202Q76 -216 58 -216ZM424 322Q424 359 407 382T357 405Q322 405 287 376T231 300Q217 269 193 170L176 102Q193 26 260 26Q298 26 334 62Q367 92 389 158T418 266T424 322Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path>
+<path stroke-width="1" id="E1-MJSZ2-28" d="M180 96T180 250T205 541T266 770T353 944T444 1069T527 1150H555Q561 1144 561 1141Q561 1137 545 1120T504 1072T447 995T386 878T330 721T288 513T272 251Q272 133 280 56Q293 -87 326 -209T399 -405T475 -531T536 -609T561 -640Q561 -643 555 -649H527Q483 -612 443 -568T353 -443T266 -270T205 -41Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-2202" d="M202 508Q179 508 169 520T158 547Q158 557 164 577T185 624T230 675T301 710L333 715H345Q378 715 384 714Q447 703 489 661T549 568T566 457Q566 362 519 240T402 53Q321 -22 223 -22Q123 -22 73 56Q42 102 42 148V159Q42 276 129 370T322 465Q383 465 414 434T455 367L458 378Q478 461 478 515Q478 603 437 639T344 676Q266 676 223 612Q264 606 264 572Q264 547 246 528T202 508ZM430 306Q430 372 401 400T333 428Q270 428 222 382Q197 354 183 323T150 221Q132 149 132 116Q132 21 232 21Q244 21 250 22Q327 35 374 112Q389 137 409 196T430 306Z"></path>
+<path stroke-width="1" id="E1-MJMAINB-76" d="M401 444Q413 441 495 441Q568 441 574 444H580V382H510L409 156Q348 18 339 6Q331 -4 320 -4Q318 -4 313 -4T303 -3H288Q273 -3 264 12T221 102Q206 135 197 156L96 382H26V444H34Q49 441 145 441Q252 441 270 444H279V382H231L284 264Q335 149 338 149Q338 150 389 264T442 381Q442 382 418 382H394V444H401Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-74" d="M26 385Q19 392 19 395Q19 399 22 411T27 425Q29 430 36 430T87 431H140L159 511Q162 522 166 540T173 566T179 586T187 603T197 615T211 624T229 626Q247 625 254 615T261 596Q261 589 252 549T232 470L222 433Q222 431 272 431H323Q330 424 330 420Q330 398 317 385H210L174 240Q135 80 135 68Q135 26 162 26Q197 26 230 60T283 144Q285 150 288 151T303 153H307Q322 153 322 145Q322 142 319 133Q314 117 301 95T267 48T216 6T155 -11Q125 -11 98 4T59 56Q57 64 57 83V101L92 241Q127 382 128 383Q128 385 77 385H26Z"></path>
+<path stroke-width="1" id="E1-MJSZ4-E152" d="M-24 327L-18 333H-1Q11 333 15 333T22 329T27 322T35 308T54 284Q115 203 225 162T441 120Q454 120 457 117T460 95V60V28Q460 8 457 4T442 0Q355 0 260 36Q75 118 -16 278L-24 292V327Z"></path>
+<path stroke-width="1" id="E1-MJSZ4-E153" d="M-10 60V95Q-10 113 -7 116T9 120Q151 120 250 171T396 284Q404 293 412 305T424 324T431 331Q433 333 451 333H468L474 327V292L466 278Q375 118 190 36Q95 0 8 0Q-5 0 -7 3T-10 24V60Z"></path>
+<path stroke-width="1" id="E1-MJSZ4-E151" d="M-10 60Q-10 104 -10 111T-5 118Q-1 120 10 120Q96 120 190 84Q375 2 466 -158L474 -172V-207L468 -213H451H447Q437 -213 434 -213T428 -209T423 -202T414 -187T396 -163Q331 -82 224 -41T9 0Q-4 0 -7 3T-10 25V60Z"></path>
+<path stroke-width="1" id="E1-MJSZ4-E150" d="M-18 -213L-24 -207V-172L-16 -158Q75 2 260 84Q334 113 415 119Q418 119 427 119T440 120Q454 120 457 117T460 98V60V25Q460 7 457 4T441 0Q308 0 193 -55T25 -205Q21 -211 18 -212T-1 -213H-18Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-22C5" d="M78 250Q78 274 95 292T138 310Q162 310 180 294T199 251Q199 226 182 208T139 190T96 207T78 250Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-2207" d="M46 676Q46 679 51 683H781Q786 679 786 676Q786 674 617 326T444 -26Q439 -33 416 -33T388 -26Q385 -22 216 326T46 676ZM697 596Q697 597 445 597T193 596Q195 591 319 336T445 80L697 596Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path>
+<path stroke-width="1" id="E1-MJSZ4-E154" d="M-10 0V120H410V0H-10Z"></path>
+<path stroke-width="1" id="E1-MJSZ2-29" d="M35 1138Q35 1150 51 1150H56H69Q113 1113 153 1069T243 944T330 771T391 541T416 250T391 -40T330 -270T243 -443T152 -568T69 -649H56Q43 -649 39 -647T35 -637Q65 -607 110 -548Q283 -316 316 56Q324 133 324 251Q324 368 316 445Q278 877 48 1123Q36 1137 35 1138Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-70" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-3BC" d="M58 -216Q44 -216 34 -208T23 -186Q23 -176 96 116T173 414Q186 442 219 442Q231 441 239 435T249 423T251 413Q251 401 220 279T187 142Q185 131 185 107V99Q185 26 252 26Q261 26 270 27T287 31T302 38T315 45T327 55T338 65T348 77T356 88T365 100L372 110L408 253Q444 395 448 404Q461 431 491 431Q504 431 512 424T523 412T525 402L449 84Q448 79 448 68Q448 43 455 35T476 26Q485 27 496 35Q517 55 537 131Q543 151 547 152Q549 153 557 153H561Q580 153 580 144Q580 138 575 117T555 63T523 13Q510 0 491 -8Q483 -10 467 -10Q446 -10 429 -4T402 11T385 29T376 44T374 51L368 45Q362 39 350 30T324 12T288 -4T246 -11Q199 -11 153 12L129 -85Q108 -167 104 -180T92 -202Q76 -216 58 -216Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path>
+<path stroke-width="1" id="E1-MJMAINB-66" d="M308 0Q290 3 172 3Q58 3 49 0H40V62H109V382H42V444H109V503L110 562L112 572Q127 625 178 658T316 699Q318 699 330 699T348 700Q381 698 404 687T436 658T449 629T452 606Q452 576 432 557T383 537Q355 537 335 555T314 605Q314 635 328 649H325Q311 649 293 644T253 618T227 560Q226 555 226 498V444H340V382H232V62H318V0H308Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+<g transform="translate(1000,0)">
+ <use xlink:href="#E1-MJMATHI-3C1" x="0" y="0"></use>
+ <use xlink:href="#E1-MJSZ2-28" x="517" y="-1"></use>
+<g transform="translate(1115,0)">
+<g transform="translate(229,0)">
+<g transform="translate(61,0)">
+<g transform="translate(120,0)">
+<rect stroke="none" width="1295" height="60" x="0" y="220"></rect>
+<g transform="translate(60,676)">
+ <use xlink:href="#E1-MJMAIN-2202" x="0" y="0"></use>
+ <use xlink:href="#E1-MJMAINB-76" x="567" y="0"></use>
+</g>
+<g transform="translate(183,-736)">
+ <use xlink:href="#E1-MJMAIN-2202" x="0" y="0"></use>
+ <use xlink:href="#E1-MJMATHI-74" x="567" y="0"></use>
+</g>
+</g>
+</g>
+<g transform="translate(0,-1273)">
+ <use xlink:href="#E1-MJSZ4-E152" x="23" y="0"></use>
+<g transform="translate(390,0)">
+ <use xlink:href="#E1-MJSZ4-E151"></use>
+ <use xlink:href="#E1-MJSZ4-E150" x="450" y="0"></use>
+</g>
+ <use xlink:href="#E1-MJSZ4-E153" x="1207" y="0"></use>
+</g>
+</g>
+<g transform="translate(0,-2844)">
+<g transform="translate(167,0)">
+<g transform="translate(-11,0)">
+<g transform="translate(0,581)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">非</text>
+<g transform="translate(681,0)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">稳</text>
+</g>
+<g transform="translate(1362,0)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">态</text>
+</g>
+</g>
+<g transform="translate(340,-533)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">加</text>
+<g transform="translate(681,0)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">速</text>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+ <use xlink:href="#E1-MJMAIN-2B" x="3454" y="0"></use>
+<g transform="translate(4455,0)">
+ <use xlink:href="#E1-MJMAIN-28" x="0" y="0"></use>
+ <use xlink:href="#E1-MJMAINB-76" x="389" y="0"></use>
+ <use xlink:href="#E1-MJMAIN-22C5" x="1219" y="0"></use>
+ <use xlink:href="#E1-MJMAIN-2207" x="1719" y="0"></use>
+ <use xlink:href="#E1-MJMAIN-29" x="2553" y="0"></use>
+ <use xlink:href="#E1-MJMAINB-76" x="2942" y="0"></use>
+<g transform="translate(12,-765)">
+ <use xlink:href="#E1-MJSZ4-E152" x="23" y="0"></use>
+<g transform="translate(503.01633597883597,0) scale(2.0017195767195766,1)">
+ <use xlink:href="#E1-MJSZ4-E154"></use>
+</g>
+<g transform="translate(1324,0)">
+ <use xlink:href="#E1-MJSZ4-E151"></use>
+ <use xlink:href="#E1-MJSZ4-E150" x="450" y="0"></use>
+</g>
+<g transform="translate(2244.7385582010584,0) scale(2.0017195767195766,1)">
+ <use xlink:href="#E1-MJSZ4-E154"></use>
+</g>
+ <use xlink:href="#E1-MJSZ4-E153" x="3075" y="0"></use>
+</g>
+<g transform="translate(1057,-2336)">
+<g transform="translate(167,0)">
+<g transform="translate(-11,0)">
+<g transform="translate(0,581)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">对</text>
+<g transform="translate(681,0)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">流</text>
+</g>
+</g>
+<g transform="translate(0,-533)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">加</text>
+<g transform="translate(681,0)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">速</text>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+ <use xlink:href="#E1-MJSZ2-29" x="8005" y="-1"></use>
+<g transform="translate(12,1714)">
+ <use xlink:href="#E1-MJSZ4-E150" x="23" y="0"></use>
+<g transform="translate(560.1621758996619,0) scale(8.017071147332834,1)">
+ <use xlink:href="#E1-MJSZ4-E154"></use>
+</g>
+<g transform="translate(3851,0)">
+ <use xlink:href="#E1-MJSZ4-E153"></use>
+ <use xlink:href="#E1-MJSZ4-E152" x="450" y="0"></use>
+</g>
+<g transform="translate(4828.332057779452,0) scale(8.017071147332834,1)">
+ <use xlink:href="#E1-MJSZ4-E154"></use>
+</g>
+ <use xlink:href="#E1-MJSZ4-E151" x="8128" y="0"></use>
+</g>
+<g transform="translate(3745,2463)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">惯</text>
+<g transform="translate(681,0)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">性</text>
+</g>
+</g>
+</g>
+ <use xlink:href="#E1-MJMAIN-3D" x="9881" y="0"></use>
+<g transform="translate(10937,0)">
+ <use xlink:href="#E1-MJMAIN-2212" x="0" y="0"></use>
+ <use xlink:href="#E1-MJMAIN-2207" x="778" y="0"></use>
+ <use xlink:href="#E1-MJMATHI-70" x="1612" y="0"></use>
+<g transform="translate(12,-709)">
+ <use xlink:href="#E1-MJSZ4-E152" x="23" y="0"></use>
+<g transform="translate(486.78779761904764,0) scale(0.29345238095238096,1)">
+ <use xlink:href="#E1-MJSZ4-E154"></use>
+</g>
+<g transform="translate(607,0)">
+ <use xlink:href="#E1-MJSZ4-E151"></use>
+ <use xlink:href="#E1-MJSZ4-E150" x="450" y="0"></use>
+</g>
+<g transform="translate(1511.0377976190475,0) scale(0.29345238095238096,1)">
+ <use xlink:href="#E1-MJSZ4-E154"></use>
+</g>
+ <use xlink:href="#E1-MJSZ4-E153" x="1641" y="0"></use>
+</g>
+<g transform="translate(339,-2280)">
+<g transform="translate(167,0)">
+<g transform="translate(-11,0)">
+<g transform="translate(0,581)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">压</text>
+<g transform="translate(681,0)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">强</text>
+</g>
+</g>
+<g transform="translate(0,-533)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">梯</text>
+<g transform="translate(681,0)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">度</text>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+ <use xlink:href="#E1-MJMAIN-2B" x="13275" y="0"></use>
+<g transform="translate(14275,0)">
+ <use xlink:href="#E1-MJMATHI-3BC" x="0" y="0"></use>
+<g transform="translate(603,0)">
+ <use xlink:href="#E1-MJMAIN-2207" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMAIN-32" x="1178" y="583"></use>
+</g>
+ <use xlink:href="#E1-MJMAINB-76" x="1890" y="0"></use>
+<g transform="translate(12,-731)">
+ <use xlink:href="#E1-MJSZ4-E152" x="23" y="0"></use>
+<g transform="translate(491.11829281886514,0) scale(0.7492939809331747,1)">
+ <use xlink:href="#E1-MJSZ4-E154"></use>
+</g>
+<g transform="translate(798,0)">
+ <use xlink:href="#E1-MJSZ4-E151"></use>
+ <use xlink:href="#E1-MJSZ4-E150" x="450" y="0"></use>
+</g>
+<g transform="translate(1706.8217648107986,0) scale(0.7492939809331747,1)">
+ <use xlink:href="#E1-MJSZ4-E154"></use>
+</g>
+ <use xlink:href="#E1-MJSZ4-E153" x="2023" y="0"></use>
+</g>
+<g transform="translate(352,-1721)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">黏</text>
+<g transform="translate(681,0)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">滞</text>
+</g>
+<g transform="translate(1362,0)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">力</text>
+</g>
+</g>
+</g>
+ <use xlink:href="#E1-MJMAIN-2B" x="16996" y="0"></use>
+<g transform="translate(17997,0)">
+<g transform="translate(262,0)">
+ <use xlink:href="#E1-MJMAINB-66" x="602" y="0"></use>
+<g transform="translate(-67,-515)">
+ <use xlink:href="#E1-MJSZ4-E152" x="23" y="0"></use>
+<g transform="translate(390,0)">
+ <use xlink:href="#E1-MJSZ4-E151"></use>
+ <use xlink:href="#E1-MJSZ4-E150" x="450" y="0"></use>
+</g>
+ <use xlink:href="#E1-MJSZ4-E153" x="1207" y="0"></use>
+</g>
+</g>
+<g transform="translate(0,-1530)">
+<g transform="translate(167,0)">
+<g transform="translate(-11,0)">
+<g transform="translate(0,24)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">其</text>
+<g transform="translate(681,0)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">他</text>
+</g>
+<g transform="translate(1362,0)">
+<text font-family="monospace" stroke="none" transform="scale(50.74127551116547) matrix(1 0 0 -1 0 0)">力</text>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</svg>
