@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #000;
+        color: #fff;
+        width: 100%;
+        height: 100%;
+      }
+      #main {
+        border: 1px solid #fff;
+        cursor: default;
+        /* position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); */
+        background-color: rgb(153, 156, 153);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="main"></canvas>
+
+    <script type="module">
+      import { MyFluidSolver } from "./MyFluidSolver.js";
+
+      class App {
+        /**
+         * size canvas 的宽度,
+         */
+        constructor(size) {
+          this.VIEW_SIZE = size || Math.min(window.innerWidth, window.innerHeight);
+          const canvas = document.getElementById("main");
+          canvas.width = canvas.height = this.VIEW_SIZE; // View size
+          this.canvas = canvas;
+
+          const context = canvas.getContext("2d");
+          var fdBuffer = context.createImageData(this.VIEW_SIZE, this.VIEW_SIZE);
+          this.context = context;
+          this.fdBuffer = fdBuffer;
+
+          this.run = this.run.bind(this);
+
+          this.NUM_OF_CELLS = 100;
+          this.fluidSolver = new MyFluidSolver(this.NUM_OF_CELLS);
+
+          // Size of each cell in pixels
+          // 64
+          this.CELL_SIZE = this.VIEW_SIZE / this.NUM_OF_CELLS;
+          this.CELL_SIZE_CEIL = Math.ceil(this.CELL_SIZE);
+
+          this.initEvent(canvas);
+        }
+
+        drawGrid() {
+          const { context, VIEW_SIZE, CELL_SIZE_CEIL } = this;
+          var i;
+
+          context.lineWidth = 1;
+          context.strokeStyle = "rgb(255, 255, 255)";
+          context.beginPath();
+
+          // Vertical
+          for (i = 0; i <= VIEW_SIZE; i += CELL_SIZE_CEIL) {
+            context.moveTo(i, 0);
+            context.lineTo(i, VIEW_SIZE);
+          }
+
+          // Horizontal
+          for (i = 0; i <= VIEW_SIZE; i += CELL_SIZE_CEIL) {
+            context.moveTo(0, i);
+            context.lineTo(VIEW_SIZE, i);
+          }
+
+          context.stroke();
+        }
+
+        addSource(event) {
+          const { fluidSolver, NUM_OF_CELLS, VIEW_SIZE, CELL_SIZE, isMouseDown } = this;
+
+          const mouseX = event.offsetX;
+          const mouseY = event.offsetY;
+
+          const i = Math.floor(mouseX / CELL_SIZE) + 1;
+          const j = Math.floor(mouseY / CELL_SIZE) + 1;
+
+          // console.error(i, j);
+
+          if (i > NUM_OF_CELLS || i < 1 || j > NUM_OF_CELLS || j < 1) return;
+          // console.error(i, j);
+
+          if (isMouseDown) {
+            // 如果按住鼠标，则向鼠标下方的单元格添加密度
+            fluidSolver.setDensity(i, j, 50);
+          }
+        }
+
+        initEvent(canvas) {
+          this.isMouseDown = false;
+          document.addEventListener(
+            "mouseup",
+            () => {
+              this.isMouseDown = false;
+            },
+            false
+          );
+          document.addEventListener(
+            "mousedown",
+            event => {
+              this.isMouseDown = true;
+              this.addSource(event);
+            },
+            false
+          );
+
+          canvas.addEventListener("mousemove", this.addSource, false);
+        }
+
+        /**
+         * Clears all the pixels on the image data.
+         *
+         * @param image {ImageData}
+         */
+        clearImageData(image) {
+          var i,
+            length = image.data.length;
+          for (i = 0; i < length; i++) {
+            image.data[i] = 0;
+          }
+        }
+
+        setPixel(x, y, color) {
+          const w = this.canvas.width;
+          const d = this.fdBuffer.data;
+          d[(y * w + x) * 4 + 0] = color[0];
+          d[(y * w + x) * 4 + 1] = color[1];
+          d[(y * w + x) * 4 + 2] = color[2];
+          d[(y * w + x) * 4 + 3] = color[3];
+        }
+
+        renderFluid() {
+          const { fluidSolver: fs, context, fdBuffer, VIEW_SIZE, CELL_SIZE_CEIL, NUM_OF_CELLS, CELL_SIZE, NUM } = this;
+
+          const invMaxColor = 1.0 / 255;
+          for (let i = 1; i <= NUM_OF_CELLS; i++) {
+            // The x position of current cell
+            const dx = (i - 0.5) * CELL_SIZE;
+
+            for (let j = 1; j <= NUM_OF_CELLS; j++) {
+              // The y position of current cell
+              const dy = (j - 0.5) * CELL_SIZE;
+
+              const cellIndex = i + (NUM_OF_CELLS + 2) * j;
+
+              // Draw density
+              const density = fs.density[cellIndex];
+              if (density > 0) {
+                let color = density * 255;
+
+                // fdBuffer.data is actually a Uint8ClampedArray so there is no need to manually clamp color values
+                if (color < 0) color = 0;
+                if (color > 255) color = 255;
+
+                const r = color;
+                const g = color * dx * invMaxColor;
+                const b = color * dy * invMaxColor;
+
+                // Draw the cell on an image for performance reasons
+                for (let l = 0; l < CELL_SIZE_CEIL; l++) {
+                  for (let m = 0; m < CELL_SIZE_CEIL; m++) {
+                    const pxX = (i - 1) * CELL_SIZE + l;
+                    const pxY = (j - 1) * CELL_SIZE + m;
+                    const pxIdx = ((pxX | pxX) + (pxY | pxY) * VIEW_SIZE) * 4;
+
+                    fdBuffer.data[pxIdx] = r;
+                    fdBuffer.data[pxIdx + 1] = g;
+                    fdBuffer.data[pxIdx + 2] = b;
+                    fdBuffer.data[pxIdx + 3] = 255;
+                  }
+                }
+              }
+
+              // Draw velocity field ?
+              // if (options.drawVelocityField && i % 2 === 0 && j % 2 === 0) {
+              //   u = fs.u[cellIndex] * 50;
+              //   v = fs.v[cellIndex] * 50;
+
+              //   context.moveTo(dx, dy);
+              //   context.lineTo(dx + u, dy + v);
+              // }
+            } // End for all cells in the y direction
+          }
+        }
+        run() {
+          const { context, VIEW_SIZE, fdBuffer } = this;
+          requestAnimationFrame(this.run);
+          this.fluidSolver.densityStep();
+
+          context.clearRect(0, 0, VIEW_SIZE, VIEW_SIZE);
+          context.putImageData(fdBuffer, 0, 0);
+          this.clearImageData(fdBuffer);
+          this.renderFluid();
+          // this.drawGrid();
+        }
+      }
+
+      window.onload = () => {
+        const app = new App(600);
+        app.run();
+        window.app = app;
+      };
+    </script>
+  </body>
+</html>

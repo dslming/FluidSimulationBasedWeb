@@ -6,7 +6,7 @@
 (function(window, document) {
   'use strict';
 
-  var NUM_OF_CELLS = 128, // Number of cells (not including the boundary)
+  var NUM_OF_CELLS = 3, // Number of cells (not including the boundary)
     VIEW_SIZE = 640, // View size (square)
     FPS = 60; // Frames per second
 
@@ -55,6 +55,7 @@
   // Create the fluid solver
   var fs = new FluidSolver(NUM_OF_CELLS);
   fs.resetVelocity();
+  window.fs = fs;
 
   // We draw the density on a bitmap for performance reasons
   var fdBuffer = context.createImageData(VIEW_SIZE, VIEW_SIZE);
@@ -145,6 +146,8 @@
     var i = (mouseX / VIEW_SIZE) * NUM_OF_CELLS + 1,
       j = (mouseY / VIEW_SIZE) * NUM_OF_CELLS + 1;
 
+    console.error(i, j);
+
     // Dont overflow grid bounds
     if (i > NUM_OF_CELLS || i < 1 || j > NUM_OF_CELLS || j < 1) return;
 
@@ -153,24 +156,24 @@
       dv = (mouseY - oldMouseY) * 1.5;
 
     // Add the mouse velocity to cells above, below, to the left, and to the right as well.
-    fs.uOld[fs.I(i, j)] = du;
-    fs.vOld[fs.I(i, j)] = dv;
+    // fs.uOld[fs.I(i, j)] = du;
+    // fs.vOld[fs.I(i, j)] = dv;
 
-    fs.uOld[fs.I(i + 1, j)] = du;
-    fs.vOld[fs.I(i + 1, j)] = dv;
+    // fs.uOld[fs.I(i + 1, j)] = du;
+    // fs.vOld[fs.I(i + 1, j)] = dv;
 
-    fs.uOld[fs.I(i - 1, j)] = du;
-    fs.vOld[fs.I(i - 1, j)] = dv;
+    // fs.uOld[fs.I(i - 1, j)] = du;
+    // fs.vOld[fs.I(i - 1, j)] = dv;
 
-    fs.uOld[fs.I(i, j + 1)] = du;
-    fs.vOld[fs.I(i, j + 1)] = dv;
+    // fs.uOld[fs.I(i, j + 1)] = du;
+    // fs.vOld[fs.I(i, j + 1)] = dv;
 
-    fs.uOld[fs.I(i, j - 1)] = du;
-    fs.vOld[fs.I(i, j - 1)] = dv;
+    // fs.uOld[fs.I(i, j - 1)] = du;
+    // fs.vOld[fs.I(i, j - 1)] = dv;
 
     if (isMouseDown) {
       // If holding down the mouse, add density to the cell below the mouse
-      fs.dOld[fs.I(i, j)] = 50;
+      fs.dOld[fs.I(i, j)] += 50;
     }
 
     if (isMouseDown && options.drawParticles) {
@@ -261,7 +264,7 @@
     deltaTime = (Date.now() - lastTime) / 1000;
 
     // Step the fluid simulation
-    fs.velocityStep();
+    // fs.velocityStep();
     fs.densityStep();
 
     // Clear the canvas
@@ -271,7 +274,7 @@
     context.putImageData(fdBuffer, 0, 0);
     clearImageData(fdBuffer);
 
-    // drawGrid();
+    drawGrid();
 
     if (options.drawVelocityField) {
       // Call once per frame

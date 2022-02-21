@@ -28,7 +28,8 @@
 
     this.n = n;
 
-    this.dt = 0.1; // The simulation time-step
+    // this.dt = 0.1; // The simulation time-step
+    this.dt = 0.01; // The simulation time-step
     // 扩散量
     this.diffusion = 0.0002; // The amount of diffusion
     // 液体的粘度
@@ -126,41 +127,41 @@
    * Velocity step.
    */
   FluidSolver.prototype.velocityStep = function() {
-    var i;
+    // var i;
 
-    this.addSource(this.u, this.uOld);
-    this.addSource(this.v, this.vOld);
+    // this.addSource(this.u, this.uOld);
+    // this.addSource(this.v, this.vOld);
 
-    if (this.doVorticityConfinement) {
-      this.vorticityConfinement(this.uOld, this.vOld);
-      this.addSource(this.u, this.uOld);
-      this.addSource(this.v, this.vOld);
-    }
+    // if (this.doVorticityConfinement) {
+    //   this.vorticityConfinement(this.uOld, this.vOld);
+    //   this.addSource(this.u, this.uOld);
+    //   this.addSource(this.v, this.vOld);
+    // }
 
-    if (this.doBuoyancy) {
-      this.buoyancy(this.vOld);
-      this.addSource(this.v, this.vOld);
-    }
+    // if (this.doBuoyancy) {
+    //   this.buoyancy(this.vOld);
+    //   this.addSource(this.v, this.vOld);
+    // }
 
-    this.swapU();
-    this.diffuse(FluidSolver.BOUNDARY_LEFT_RIGHT, this.u, this.uOld, this.viscosity);
+    // this.swapU();
+    // this.diffuse(FluidSolver.BOUNDARY_LEFT_RIGHT, this.u, this.uOld, this.viscosity);
 
-    this.swapV();
-    this.diffuse(FluidSolver.BOUNDARY_TOP_BOTTOM, this.v, this.vOld, this.viscosity);
+    // this.swapV();
+    // this.diffuse(FluidSolver.BOUNDARY_TOP_BOTTOM, this.v, this.vOld, this.viscosity);
 
-    this.project(this.u, this.v, this.uOld, this.vOld);
-    this.swapU();
-    this.swapV();
+    // this.project(this.u, this.v, this.uOld, this.vOld);
+    // this.swapU();
+    // this.swapV();
 
-    this.advect(FluidSolver.BOUNDARY_LEFT_RIGHT, this.u, this.uOld, this.uOld, this.vOld);
-    this.advect(FluidSolver.BOUNDARY_TOP_BOTTOM, this.v, this.vOld, this.uOld, this.vOld);
+    // this.advect(FluidSolver.BOUNDARY_LEFT_RIGHT, this.u, this.uOld, this.uOld, this.vOld);
+    // this.advect(FluidSolver.BOUNDARY_TOP_BOTTOM, this.v, this.vOld, this.uOld, this.vOld);
 
-    this.project(this.u, this.v, this.uOld, this.vOld);
+    // this.project(this.u, this.v, this.uOld, this.vOld);
 
-    // Reset for next step
-    for (i = 0; i < this.numOfCells; i++) {
-      this.uOld[i] = this.vOld[i] = 0;
-    }
+    // // Reset for next step
+    // for (i = 0; i < this.numOfCells; i++) {
+    //   this.uOld[i] = this.vOld[i] = 0;
+    // }
   };
 
   /**
