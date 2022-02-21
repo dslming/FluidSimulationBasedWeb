@@ -355,6 +355,10 @@
    * The advection step moves the density through the static velocity field.
    * Instead of moving the cells forward in time, we treat the cell's center as a particle
    * and then trace it back in time to look for the 'particles' which end up at the cell's center.
+   * 平流步骤通过静态速度场移动密度。
+     *
+     我们没有将细胞及时向前移动， 而是将细胞的中心视为一个粒子 *
+     然后及时追溯以寻找最终到达细胞中心的“ 粒子”。
    *
    * @param b {Number}
    * @param d {Array<Number>}
@@ -399,7 +403,9 @@
 
   /**
    * Forces the velocity field to be mass conserving.
+   * 强制速度场是质量守恒的。
    * This step is what actually produces the nice looking swirly vortices.
+   * 这一步实际上产生了漂亮的漩涡状漩涡。
    *
    * It uses a result called Hodge Decomposition which says that every velocity field is the sum
    * of a mass conserving field, and a gradient field. So we calculate the gradient field, and subtract
@@ -471,6 +477,7 @@
 
   /**
    * Set boundary conditions.
+   * 设置边界条件。
    *
    * @param b {Number}
    * @param x {Array<Number>}

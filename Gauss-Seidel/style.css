@@ -1,0 +1,73 @@
+body {
+  font-family: "Montserrat", sans-serif;
+  margin: 2.5%;
+  background: linear-gradient(to right, #cb2d3e, #ef473c);
+}
+
+h1 {
+  text-align: center;
+}
+
+input[type="text"] {
+  padding: 1%;
+  width: 5%;
+  text-align: center;
+}
+
+#iter,
+#round {
+  width: 10%;
+}
+
+#main {
+  display: flex;
+  flex-direction: row;
+}
+
+#submit {
+  padding: 2%;
+  border-radius: 10px;
+  border: 1px solid #000000;
+  background-color: #dda0dd;
+  font-weight: bold;
+}
+
+#submit:hover {
+  cursor: pointer;
+}
+
+#equations,
+#output {
+  width: 50%;
+  margin: 2%;
+}
+
+#output {
+  background-color: #000000;
+  color: #ffffff;
+  padding-left: 1%;
+  overflow-y: scroll;
+  height: 450px;
+}
+
+@media only screen and (max-width: 768px) {
+  #main,
+  #division {
+    flex-direction: column;
+  }
+
+  #equations,
+  #output {
+    width: 90%;
+    margin: 2%;
+  }
+
+  input[type="text"] {
+    width: 10%;
+  }
+
+  #iter,
+  #round {
+    width: 30%;
+  }
+}

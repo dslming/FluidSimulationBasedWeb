@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gauss-Seidel Method</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.1.1/math.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Gauss-Seidel Method</h1>
+
+    <div id="main">
+      <div id="equations">
+        <div class="div">
+          <input type="text" id="a1" /> x + <input type="text" id="b1" /> y + <input type="text" id="c1" /> z =
+          <input type="text" id="const1" />
+        </div>
+
+        <div class="div">
+          <input type="text" id="a2" /> x + <input type="text" id="b2" /> y + <input type="text" id="c2" /> z =
+          <input type="text" id="const2" />
+        </div>
+
+        <div class="div">
+          <input type="text" id="a3" /> x + <input type="text" id="b3" /> y + <input type="text" id="c3" /> z =
+          <input type="text" id="const3" />
+        </div>
+
+        <h2>Iterations</h2>
+        <input type="text" id="iter" value="2" /><br />
+
+        <h2>Round(精度)</h2>
+        <input type="text" id="round" value="5" /><br /><br />
+
+        <button onclick="clickButton()" id="submit">Get the answer</button>
+      </div>
+
+      <div id="output">
+        <h2>Output</h2>
+        <p id="ans"></p>
+      </div>
+    </div>
+  </body>
+  <script src="script.js"></script>
+</html>

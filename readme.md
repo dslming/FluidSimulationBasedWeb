@@ -6,7 +6,6 @@
 
 [fluidwebgl](https://29a.ch/sandbox/2012/fluidwebgl/)
 [webgl-fluid-simulation](https://29a.ch/2012/12/16/webgl-fluid-simulation)
-[](https://p.brm.sk/fluid/)
 
 [Fluid-JS](https://github.com/malik-tillman/Fluid-JS)
 
@@ -20,7 +19,10 @@
 
 [WebGL-SPH2D](https://lightsteelblue.github.io/WebGL-SPH2D/)
 
-[流体模拟器webgl](https://github.com/portsmouth/Trinity)
+[流体模拟器 webgl](https://github.com/portsmouth/Trinity)
+
+[demo](https://nerget.com/fluidSim/)
+
 ### doc
 
 [Fluid Simulation (with WebGL demo)](http://jamie-wong.com/2016/08/05/webgl-fluid-simulation/)
@@ -32,3 +34,7 @@
 [navier-stokes-fluid-simulation-on-html5-canvas](https://www.esimov.com/2014/01/navier-stokes-fluid-simulation-on-html5-canvas#.Yg5h9ZNBwV8)
 
 [Gentle Introduction to Realtime Fluid Simulation for Programmers and Technical Artists](https://shahriyarshahrabi.medium.com/gentle-introduction-to-fluid-simulation-for-programmers-and-technical-artists-7c0045c40bac)
+
+#### SPH
+
+[sph 2d](https://p.brm.sk/fluid/)

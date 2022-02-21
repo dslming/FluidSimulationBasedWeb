@@ -2,6 +2,8 @@
 
 [【manim 物理模拟】流体](https://www.bilibili.com/video/BV1z34y1C7o4?p=1&share_medium=iphone&share_plat=ios&share_session_id=DE0A9594-B51F-44FC-99DF-ABEFFB83F4D1&share_source=WEIXIN&share_tag=s_i&timestamp=1645254074&unique_k=X6DRxFr)
 
+[解 n-s 使用偏微分](https://ahrjs.kr/%EC%A0%84%EC%82%B0%EC%9C%A0%EC%B2%B4%EC%97%AD%ED%95%99-cfd-with-python-navier-stokes-equation/)
+
 #### 0 近似求解线性方程组
 
 使用高斯-塞德尔迭代

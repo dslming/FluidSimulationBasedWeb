@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #000;
+        color: #fff;
+        width: 100%;
+        height: 100%;
+      }
+      #main {
+        border: 1px solid #fff;
+        cursor: default;
+        /* position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); */
+        background-color: #0f0;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="main"></canvas>
+
+    <script type="module">
+      import { MyFluidSolver } from "./myFluidSolver.js";
+
+      class App {
+        constructor(size) {
+          this.VIEW_SIZE = size || Math.min(window.innerWidth, window.innerHeight);
+          const canvas = document.getElementById("main");
+          canvas.width = canvas.height = this.VIEW_SIZE; // View size
+
+          const context = canvas.getContext("2d");
+          var fdBuffer = context.createImageData(this.VIEW_SIZE, this.VIEW_SIZE);
+          this.context = context;
+
+          this.run = this.run.bind(this);
+          this.onMouseMove = this.onMouseMove.bind(this);
+
+          this.NUM_OF_CELLS = 3;
+          this.fluidSolver = new MyFluidSolver(this.NUM_OF_CELLS);
+
+          // Size of each cell in pixels
+          this.CELL_SIZE = this.VIEW_SIZE / (this.NUM_OF_CELLS + 2);
+          this.CELL_SIZE_CEIL = Math.ceil(this.CELL_SIZE);
+
+          this.initEvent(canvas);
+          this.drawGrid();
+        }
+
+        drawGrid() {
+          const { context, VIEW_SIZE, CELL_SIZE_CEIL } = this;
+          var i;
+
+          context.lineWidth = 1;
+          context.strokeStyle = "rgb(255, 255, 255)";
+          context.beginPath();
+
+          // Vertical
+          for (i = 0; i <= VIEW_SIZE; i += CELL_SIZE_CEIL) {
+            context.moveTo(i, 0);
+            context.lineTo(i, VIEW_SIZE);
+          }
+
+          // Horizontal
+          for (i = 0; i <= VIEW_SIZE; i += CELL_SIZE_CEIL) {
+            context.moveTo(0, i);
+            context.lineTo(VIEW_SIZE, i);
+          }
+
+          context.stroke();
+        }
+
+        onMouseMove(event) {
+          const { NUM_OF_CELLS, CELL_SIZE } = this;
+          var k, p;
+
+          var mouseX = event.offsetX,
+            mouseY = event.offsetY;
+
+          // Find the cell below the mouse
+          const i = mouseX / CELL_SIZE;
+          const j = mouseY / CELL_SIZE;
+          this.fluidSolver.addDensitySource(i, j, 100);
+          this.fluidSolver.addVelocitySource(i, j, 0.5, 0);
+          // Dont overflow grid bounds
+          // console.error(i, j);
+          // if (i > NUM_OF_CELLS || i < 1 || j > NUM_OF_CELLS || j < 1) return;
+
+          // // Mouse velocity
+          // var du = (mouseX - oldMouseX) * 1.5,
+          //   dv = (mouseY - oldMouseY) * 1.5;
+
+          // // Add the mouse velocity to cells above, below, to the left, and to the right as well.
+          // fs.uOld[fs.I(i, j)] = du;
+          // fs.vOld[fs.I(i, j)] = dv;
+
+          // fs.uOld[fs.I(i + 1, j)] = du;
+          // fs.vOld[fs.I(i + 1, j)] = dv;
+
+          // fs.uOld[fs.I(i - 1, j)] = du;
+          // fs.vOld[fs.I(i - 1, j)] = dv;
+
+          // fs.uOld[fs.I(i, j + 1)] = du;
+          // fs.vOld[fs.I(i, j + 1)] = dv;
+
+          // fs.uOld[fs.I(i, j - 1)] = du;
+          // fs.vOld[fs.I(i, j - 1)] = dv;
+
+          // if (isMouseDown) {
+          //   // If holding down the mouse, add density to the cell below the mouse
+          //   // 如果按住鼠标，则向鼠标下方的单元格添加密度
+          //   fs.dOld[fs.I(i, j)] = 50;
+          // }
+
+          // if (isMouseDown && options.drawParticles) {
+          //   // Add particles
+          //   for (k = 0; k < 5; k++) {
+          //     p = new Particle(mouseX + getRandom(-50, 50), mouseY + getRandom(-50, 50));
+
+          //     p.vx = du;
+          //     p.vy = dv;
+          //     particles.push(p);
+          //   }
+          // }
+
+          // Save current mouse position for next frame
+          // this.oldMouseX = mouseX;
+          // this.oldMouseY = mouseY;
+        }
+
+        initEvent(canvas) {
+          this.isMouseDown = false;
+          document.addEventListener(
+            "mouseup",
+            () => {
+              this.isMouseDown = false;
+            },
+            false
+          );
+          document.addEventListener(
+            "mousedown",
+            () => {
+              this.isMouseDown = true;
+            },
+            false
+          );
+
+          canvas.addEventListener("mousemove", this.onMouseMove, false);
+        }
+        run() {
+          requestAnimationFrame(this.run);
+        }
+      }
+
+      window.onload = () => {
+        const app = new App(320);
+        app.run();
+        window.app = app;
+      };
+    </script>
+  </body>
+</html>
