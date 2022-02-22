@@ -49,12 +49,12 @@ class MyFluidSolver {
 
   setDensityOld(i, j, amount) {
     const index = this.getIndex(i, j);
-    this.densityOld[index] = amount;
+    this.density[index] = amount;
   }
 
   setDensity(i, j, amount) {
-    const index = this.getIndex(i, j);
-    this.density[index] = amount;
+    // const index = this.getIndex(i, j);
+    // this.density[index] = amount;
   }
 
   // 添加密度源
@@ -84,15 +84,15 @@ class MyFluidSolver {
 
   /**
    * 在相邻细胞之间扩散密度。
-   * @param b {Number}
+   * @param boundary { Number }
    * @param x {Array<Number>}
    * @param x0 {Array<Number>}
    * @param diffusion {Number}
    * @private
    */
-  diffuse(boundary, dest, src, diffusion) {
+  diffuse(boundary, value, oldValue, diffusion) {
     var a = this.dt * diffusion * this.N * this.N;
-    this.linearSolve(boundary, dest, src, a, 1 + 4 * a);
+    this.linearSolve(boundary, value, oldValue, a, 1 + 4 * a);
   }
 
   /**
@@ -221,22 +221,23 @@ class MyFluidSolver {
    * @param c {Number}
    * @private
    */
-  linearSolve(b, x, x0, a, c) {
-    var i, j, k, invC = 1.0 / c;
+  linearSolve(boundary, x, x0, k, c) {
+    const invC = 1.0 / c;
 
-    for (k = 0; k < this.iterations; k++) {
-      for (i = 1; i <= this.N; i++) {
-        for (j = 1; j <= this.N; j++) {
+    for (let l = 0; k < this.iterations; l++) {
+      for (let i = 1; i <= this.N; i++) {
+        for (let j = 1; j <= this.N; j++) {
           const iCenter = this.getIndex(i, j);
           const iLeft = this.getIndex(i - 1, j);
           const iRight = this.getIndex(i + 1, j);
           const iTop = this.getIndex(i, j + 1);
           const iBottom = this.getIndex(i, j - 1);
-          x[iCenter] = (x0[iCenter] + a * (x[iLeft] + x[iRight] + x[iTop] + x[iBottom])) * invC;
+
+          x[iCenter] = (x0[iCenter] + k * (x[iLeft] + x[iRight] + x[iTop] + x[iBottom])) * invC;
         }
       }
 
-      this.setBoundary(b, x);
+      this.setBoundary(boundary, x);
     }
   }
 
@@ -275,7 +276,9 @@ class MyFluidSolver {
   }
 
   densityStep() {
-    this.addSource(this.density, this.densityOld);
+    // this.addSource(this.density, this.densityOld);
+
+    // density = 0, densityOld: 有内容
     this.swapD();
     this.diffuse(BOUNDARY.NONE, this.density, this.densityOld, this.diffusion);
     this.swapD();
