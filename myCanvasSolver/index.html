@@ -22,7 +22,7 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%); */
-        background-color: rgb(153, 156, 153);
+        /* background-color: rgb(153, 156, 153); */
       }
     </style>
   </head>
@@ -99,7 +99,7 @@
 
           if (isMouseDown) {
             // 如果按住鼠标，则向鼠标下方的单元格添加密度
-            fluidSolver.setDensity(i, j, 50);
+            fluidSolver.setDensityOld(i, j, 50);
           }
         }
 
@@ -109,6 +109,7 @@
             "mouseup",
             () => {
               this.isMouseDown = false;
+              // console.error("up");
             },
             false
           );
@@ -117,11 +118,19 @@
             event => {
               this.isMouseDown = true;
               this.addSource(event);
+              // console.error("down");
             },
             false
           );
 
-          canvas.addEventListener("mousemove", this.addSource, false);
+          canvas.addEventListener(
+            "mousemove",
+            event => {
+              this.addSource(event);
+              // console.error("move");
+            },
+            false
+          );
         }
 
         /**
@@ -163,11 +172,11 @@
               // Draw density
               const density = fs.density[cellIndex];
               if (density > 0) {
-                let color = density * 255;
+                let color = density * 200;
 
                 // fdBuffer.data is actually a Uint8ClampedArray so there is no need to manually clamp color values
                 if (color < 0) color = 0;
-                if (color > 255) color = 255;
+                if (color > 200) color = 200;
 
                 const r = color;
                 const g = color * dx * invMaxColor;
