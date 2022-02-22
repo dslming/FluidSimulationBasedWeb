@@ -21,7 +21,7 @@ class MyFluidSolver {
     // 液体的粘度
     this.viscosity = 0;
     // 扩散量
-    this.diffusion = 0.0002;
+    this.diffusion = 0.002;
 
     this.velocityX = new Array(this.numOfCells).fill(0);
     this.velocityY = new Array(this.numOfCells).fill(0);
@@ -85,14 +85,14 @@ class MyFluidSolver {
   /**
    * 在相邻细胞之间扩散密度。
    * @param boundary { Number }
-   * @param x {Array<Number>}
-   * @param x0 {Array<Number>}
+   * @param next { Array < Number > }
+   * @param current { Array < Number > }
    * @param diffusion {Number}
    * @private
    */
-  diffuse(boundary, value, oldValue, diffusion) {
-    var a = this.dt * diffusion * this.N * this.N;
-    this.linearSolve(boundary, value, oldValue, a, 1 + 4 * a);
+  diffuse(boundary, next, current, diffusion) {
+    var k = this.dt * diffusion * this.N * this.N;
+    this.linearSolve(boundary, next, current, k);
   }
 
   /**
@@ -173,31 +173,31 @@ class MyFluidSolver {
    * @private
    */
   advect(b, d, d0, u, v) {
-    var i, j, i0, j0, i1, j1;
-    var x, y, s0, t0, s1, t1, dt0;
+    const dt0 = this.dt * this.N;
 
-    dt0 = this.dt * this.N;
-    for (i = 1; i <= this.N; i++) {
-      for (j = 1; j <= this.N; j++) {
+    for (let i = 1; i <= this.N; i++) {
+      for (let j = 1; j <= this.N; j++) {
+
         const index = this.getIndex(i, j);
-        x = i - dt0 * u[index];
-        y = j - dt0 * v[index];
+        let x = i - dt0 * u[index];
+        let y = j - dt0 * v[index];
 
         if (x < 0.5) x = 0.5;
         if (x > this.N + 0.5) x = this.N + 0.5;
 
-        i0 = (x | x);
-        i1 = i0 + 1;
-
         if (y < 0.5) y = 0.5;
         if (y > this.N + 0.5) y = this.N + 0.5;
 
-        j0 = (y | y);
-        j1 = j0 + 1;
-        s1 = x - i0;
-        s0 = 1 - s1;
-        t1 = y - j0;
-        t0 = 1 - t1;
+        const i0 = (x | x);
+        const i1 = i0 + 1;
+
+        const j0 = (y | y);
+        const j1 = j0 + 1;
+
+        const s1 = x - i0;
+        const s0 = 1 - s1;
+        const t1 = y - j0;
+        const t0 = 1 - t1;
 
         const index0 = this.getIndex(i0, j0);
         const index1 = this.getIndex(i0, j1);
@@ -215,16 +215,14 @@ class MyFluidSolver {
    * Solve a linear system of equations using Gauss-Seidel method.
    *
    * @param b {Number}
-   * @param x {Array<Number>}
-   * @param x0 {Array<Number>}
+   * @param next { Array < Number > }
+   * @param current { Array < Number > }
    * @param a {Number}
    * @param c {Number}
    * @private
    */
-  linearSolve(boundary, x, x0, k, c) {
-    const invC = 1.0 / c;
-
-    for (let l = 0; k < this.iterations; l++) {
+  linearSolve(boundary, next, current, k) {
+    for (let l = 0; l < this.iterations; l++) {
       for (let i = 1; i <= this.N; i++) {
         for (let j = 1; j <= this.N; j++) {
           const iCenter = this.getIndex(i, j);
@@ -233,11 +231,12 @@ class MyFluidSolver {
           const iTop = this.getIndex(i, j + 1);
           const iBottom = this.getIndex(i, j - 1);
 
-          x[iCenter] = (x0[iCenter] + k * (x[iLeft] + x[iRight] + x[iTop] + x[iBottom])) * invC;
+          const sn = (next[iLeft] + next[iRight] + next[iTop] + next[iBottom]) / 4;
+          next[iCenter] = (current[iCenter] + sn * k) / (k + 1);
         }
       }
 
-      this.setBoundary(boundary, x);
+      this.setBoundary(boundary, next);
     }
   }
 
@@ -276,12 +275,21 @@ class MyFluidSolver {
   }
 
   densityStep() {
-    // this.addSource(this.density, this.densityOld);
+    // 初始: density = 0, densityOld: 内容
 
-    // density = 0, densityOld: 有内容
+    // addSource: density = density+内容, densityOld: 内容
+    this.addSource(this.density, this.densityOld);
+
+    // swapD: density = 内容, densityOld: density+内容
     this.swapD();
+
+    // diffuse: density = 新内容, densityOld: density+内容
     this.diffuse(BOUNDARY.NONE, this.density, this.densityOld, this.diffusion);
+
+    //  swapD: density = density+内容, densityOld: 新内容
     this.swapD();
+
+
     this.advect(BOUNDARY.NONE, this.density, this.densityOld, this.velocityX, this.velocityY);
 
     // Reset for next step

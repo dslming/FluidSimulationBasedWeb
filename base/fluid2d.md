@@ -37,7 +37,7 @@ $$
 整理:
 
 $$
-s_n = \frac{d_n(i-1,j)+d_n(i_+1,j)+d_n(i,j-1)+d_n(j+1)}{4} \\
+s_n = \frac{d_n(i-1,j)+d_n(i+1,j)+d_n(i,j-1)+d_n(j+1)}{4} \\
 d_n = \frac{d_c+ks_n}{1+k}
 $$
 
