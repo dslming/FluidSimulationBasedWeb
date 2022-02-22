@@ -1,0 +1,41 @@
+{
+  "name": "gl-water2d",
+  "version": "1.0.0",
+  "description": "Smoothed Particle Hydrodynamic in WebGL",
+  "scripts": {
+    "start": "budo --verbose src/index.js -t glslify --live --open",
+    "test": "standard"
+  },
+  "keywords": [],
+  "author": "Eric Arnebäck <arnebackeric@gmail.com> (https://github.com/Erkaman)",
+  "license": "MIT",
+  "devDependencies": {
+    "budo": "^8.3.0",
+    "clamp": "^1.0.1",
+    "filesaver.js": "^0.2.0",
+    "gl-buffer": "^2.1.2",
+    "gl-mat4": "^1.1.4",
+    "gl-now": "^1.4.0",
+    "gl-shader": "^4.2.0",
+    "gl-texture2d": "^2.0.10",
+    "gl-vec2": "^1.0.0",
+    "gl-vec3": "^1.0.3",
+    "glslify": "^5.0.2",
+    "ndpack-image": "^2.0.0",
+    "pnp-gui": "0.0.4"
+  },
+  "dependencies": {},
+  "directories": {
+    "example": "example"
+  },
+  "browserify": {
+    "transform": [
+      "glslify"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Erkaman/gl-water2d.git"
+  },
+  "homepage": "https://github.com/Erkaman/gl-water2d#readme"
+}

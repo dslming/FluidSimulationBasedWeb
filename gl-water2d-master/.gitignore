@@ -1,0 +1,10 @@
+.idea/
+/.DS_Store
+/node_modules
+test.py
+make_gif.py
+video.py
+frames/
+frames2/
+frame*
+video/
