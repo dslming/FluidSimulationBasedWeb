@@ -11,6 +11,8 @@ ref:
 http://rlguy.com/sphfluidsim/
 https://lucasschuermann.com/writing/implementing-sph-in-2d
 
+PIC/FLIP/APIC
+
 $$ {\large p*i = \sum*{j}^{ } m*jW*{ij} } $$
 
 $$ {\large W\_{ij} = \frac{315}{64\pi h^9}\left( h^2 - r^2 \right)^3 } $$

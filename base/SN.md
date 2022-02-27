@@ -15,7 +15,7 @@
 $$
 \frac{\partial\boldsymbol{v}}{\partial t} +
 (\boldsymbol{v} \cdot \nabla)\boldsymbol{v} = -
-\frac{1}{\rho}\nabla p+ \nu \nabla^2\boldsymbol{v} + f
+\frac{1}{\rho}\nabla p+ \mu \nabla^2\boldsymbol{v} + f
 $$
 
 ![alt](./im/002.svg)
@@ -26,7 +26,7 @@ $$\nabla \cdot \boldsymbol{v} = 0$$
 
 $\boldsymbol{v}(x,y,t)$ 速度矢量
 $\rho(x,y,t)$ 液体密度
-$\nu$ 是运动粘度 (常数)
+$\mu$ 是运动粘度 (常数)
 $p$ 压力 (常数)
 F 位体积流体受的外力
 将速度矢量$\boldsymbol{v}$拆成(u,v)的分量形式:
