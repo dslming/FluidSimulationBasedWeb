@@ -1,0 +1,242 @@
+% !TEX encoding = UTF-8 Unicode
+\documentclass[11pt,norsk,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[norsk]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{mathrsfs}
+\usepackage{amsfonts}
+\usepackage{mathabx}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{esvect}
+\usepackage[thinc]{esdiff}
+\usepackage{pgfplots}
+\usepackage{titlesec}
+\usepackage{multicol}
+\usetikzlibrary{shapes, calc}
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage{verbatim}
+\usetikzlibrary{decorations.pathreplacing}
+
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{#1}{}}
+
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=6.5in
+\textheight=9.0in
+\headsep=0.25in
+\linespread{1.15}
+
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+\titleformat*{\section}{\large\bfseries}
+\titleformat*{\subsection}{\normalsize\bfseries}
+
+\renewcommand{\thesubsubsection}{\arabic{section}.\alph{subsection}.\roman{subsubsection}}
+
+\mathcode`\*="8000
+{\catcode`\*\active\gdef*{\cdot}}
+
+\newcommand{\lapl}[1]{\mathscr{L}\left\{#1\right\}}
+\newcommand{\invlapl}[1]{\mathscr{L}^{-1}\left\{#1\right\}}
+\newcommand{\ziint}{\int_0^{\infty}}
+\newcommand{\zi}{_0^{\infty}}
+\newcommand{\clint}[3]{\left[ #1 \right]_{#2}^{#3}}
+\newcommand{\ppclint}[1]{\clint{#1}{-\pi}{\pi}}
+\newcommand{\gamfunc}[1]{\Gamma \left( #1 \right)}
+\newcommand{\ppint}{\int_{-\pi}^{\pi}}
+\newcommand{\bpar}[1]{\left( #1 \right)}
+
+\tikzset{every entity/.style={draw=black, fill=white!20}}
+\tikzset{every attribute/.style={draw=black, fill=white!20}}
+\tikzset{every relationship/.style={draw=black, fill=white!20}}
+
+
+\title{
+    \vspace{2in}
+    \textmd{\textbf{Smoothed particle hydrodynamics}}\\
+    \normalsize\vspace{0.1in}\small{\today}\\
+    \vspace{3in}
+}
+
+\author{\textbf{Mathias Chunnoo}}
+
+\date{}
+
+\cfoot{\hspace*{2.6cm} Page \thepage\ of \pageref{LastPage}}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+\section{2D Kernels}
+
+\subsection{Polynomial kernel}
+
+\begin{equation}
+    W_{poly}(\vv{r}, h) = 
+    \begin{dcases}
+        \frac{4}{\pi h^8}
+        \left( h^2 - \lVert \vv{r} \rVert^2 \right)^3
+        &\text{if } 0 \le \lVert \vv{r} \rVert \le h\\
+        0 &\text{otherwise}
+    \end{dcases}
+\end{equation}
+
+\subsection{Spiky kernel}
+
+\begin{equation}
+    \nabla W_{spiky}(\vv{r}, h) = 
+    \begin{dcases}
+        -\frac{30}{\pi h^5}
+        \frac{\vv{r}}{\lVert \vv{r} \rVert}
+        \left( h - \lVert \vv{r} \rVert \right)^2
+        &\text{if } 0 \le \lVert \vv{r} \rVert \le h\\
+        0 &\text{otherwise}
+    \end{dcases}
+\end{equation}
+
+\subsection{Viscosity kernel}
+
+\begin{equation}
+    \nabla^2 W_{visc}(\vv{r}, h) = 
+    \begin{dcases}
+        -\frac{20}{\pi h^5}
+        \left( h - \lVert \vv{r} \rVert \right)
+        &\text{if } 0 \le \lVert \vv{r} \rVert \le h\\
+        0 &\text{otherwise}
+    \end{dcases}
+\end{equation}
+
+
+\section{Navier-Stokes}
+
+\begin{equation}
+    \diff{\vv{v}_i}{t} =
+    - \frac{1}{\rho_i} \nabla p
+    + \frac{\mu}{\rho_i} \nabla^2 \vv{v}
+    + \vv{f}
+\end{equation}
+
+\begin{equation}
+    \rho_i \approx
+    \sum_{j} m_j
+    W_{poly}(\vv{r}_i - \vv{r}_j, h)
+\end{equation}
+
+\begin{equation}
+    p_i = k (\rho_i - \rho_0)
+\end{equation}
+
+\begin{equation}
+    \frac{\nabla p_i}{\rho_i} \approx
+    \sum_j m_j \left( \frac{p_i}{\rho_i^2} + \frac{p_j}{\rho_j^2} \right)
+    \nabla W_{spiky}(\vv{r}_i - \vv{r}_j, h)
+\end{equation}
+
+\begin{equation}
+    \frac{\mu}{\rho_i} \nabla^2 \vv{v}_i \approx
+    \frac{\mu}{\rho_i} \sum_j m_j \left( \frac{\vv{v}_j - \vv{v}_i}{\rho_j} \right)
+    \nabla^2 W_{visc}(\vv{r}_i - \vv{r}_j, h)
+\end{equation}
+
+
+\newpage
+\section{Values}
+
+\subsection{Initial particle grid and area}
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[scale=3.0]
+        %\draw[<->] (0, -1.25) -- (0, 1.25);
+        %\draw[<->] (-1.25, 0) -- (1.25, 0);
+        \draw[dotted] (-1.0, -1.0) -- (1.0, -1.0)
+            -- (1.0, 1.0) -- (-1.0, 1.0) -- cycle;
+        \foreach \i in {0,...,4}{
+            \foreach \j in {0,...,4}{
+                \draw (-0.5 + \i / 4, -0.5 + \j / 4) circle [radius=0.05];
+            }
+        }
+        \draw[|-|] (-0.5, 0.6) -- (0.0, 0.6) node[above] {$S$} -- (0.5, 0.6);
+        \draw[|-|] (-0.5, 0.7) -- (-0.375, 0.7) node[above] {$\Delta s$} -- (-0.25, 0.7);
+    \end{tikzpicture}
+\end{figure}
+
+\begin{equation}
+    \Delta s = \frac{S}{\sqrt{n} - 1}
+\end{equation}
+
+\begin{equation}
+    A = S^2
+\end{equation}
+
+\subsection{Gravity}
+
+\begin{equation}
+    g = \begin{bmatrix} 0 \\ -9.81 \end{bmatrix}
+\end{equation}
+
+\subsection{Rest density}
+
+\begin{equation}
+    \rho_0 = 1000
+\end{equation}
+
+\subsection{Viscosity term}
+
+\begin{equation}
+    \mu = ?
+\end{equation}
+
+\subsection{Mass}
+
+\begin{equation}
+    M = A \rho_0
+\end{equation}
+
+\begin{equation}
+    m = \frac{M}{n}
+\end{equation}
+
+\begin{equation}
+    n = \rho_0 \frac{A}{m}
+\end{equation}
+
+\subsection{Support radius}
+
+\begin{equation}
+    x = \frac{n}{A} \pi h^2
+\end{equation}
+
+\begin{equation}
+    h = \sqrt{\frac{A x}{\pi n}}
+\end{equation}
+
+\subsection{Time step and Courant condition}
+
+\begin{equation}
+    \xi = 4.9633
+\end{equation}
+
+\begin{equation}
+    \Delta t = \operatorname*{min}_{i} \left[ \frac{0.5 h}{c_s + \frac{2 \xi \mu}{h \rho_i}} \right]
+\end{equation}
+
+\begin{equation}
+    \lambda \approx 0.4
+\end{equation}
+
+\begin{equation}
+    \Delta t \le \lambda \frac{h}{\lVert \mathbf{v}_{max} \rVert}
+\end{equation}
+
+
+
+\end{document}
