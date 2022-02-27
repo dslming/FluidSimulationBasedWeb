@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="./css/main.css" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="subWrapper">
+        <p>Jacobi</p>
+        <canvas id="jacobi"></canvas>
+        <p id="jacobiStatus"></p>
+      </div>
+      <div class="subWrapper">
+        <p>Gauss-Seidel</p>
+        <canvas id="gaussSeidel"> </canvas>
+        <p id="gaussSeidelStatus"></p>
+      </div>
+      <div class="subWrapper">
+        <p>Successive over-relaxation (ω = <var id="sorOmega"></var>)</p>
+        <canvas id="sor"> </canvas>
+        <p id="sorStatus"></p>
+      </div>
+    </div>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
