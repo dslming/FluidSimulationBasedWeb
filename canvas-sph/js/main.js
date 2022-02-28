@@ -24,6 +24,7 @@ function main() {
   canvas.height = height;
   const ctx = canvas.getContext("2d");
 
+  // 粒子间距
   const particleSpacing = 0.01136363636;
   const supportRadius = Math.sqrt(
     (Math.pow(particleSpacing, 2) * 20) / Math.PI
@@ -78,7 +79,7 @@ function main() {
     eps,
     box,
   });
-
+  window.sph = sph;
   sph.generateParticleRect({
     randomization: particleSpacing / 4.0,
     left: 3.0 / 8.0,
@@ -98,8 +99,7 @@ function main() {
       ({ minP, maxP }, { p }) => ({
         minP: Math.min(minP, p),
         maxP: Math.max(maxP, p),
-      }),
-      { minP: Infinity, maxP: -Infinity }
+      }), { minP: Infinity, maxP: -Infinity }
     );
 
     ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";

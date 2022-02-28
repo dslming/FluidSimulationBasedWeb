@@ -28,6 +28,7 @@ class SPH {
     this.box = box;
     this.eps = eps;
 
+    // 颗粒质量
     this.particleMass = Math.pow(this.dx, 2) * this.rho_0;
 
     this.generateLookupTable();
@@ -118,14 +119,10 @@ class SPH {
     const lookupIndex = this.getLookupIndex(p_i);
     const foundParticles = [];
     for (
-      let i = Math.max(0, lookupIndex.i - 1);
-      i <= Math.min(this.lookupTable.length - 1, lookupIndex.i + 1);
-      i++
+      let i = Math.max(0, lookupIndex.i - 1); i <= Math.min(this.lookupTable.length - 1, lookupIndex.i + 1); i++
     ) {
       for (
-        let j = Math.max(0, lookupIndex.j - 1);
-        j <= Math.min(this.lookupTable[i].length - 1, lookupIndex.j + 1);
-        j++
+        let j = Math.max(0, lookupIndex.j - 1); j <= Math.min(this.lookupTable[i].length - 1, lookupIndex.j + 1); j++
       ) {
         this.lookupTable[i][j].forEach((idx) => {
           if (

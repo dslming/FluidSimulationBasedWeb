@@ -325,6 +325,7 @@ var SPHSimulation = function(canvas, time, width, height, ndivsX, ndivsY, kernel
   this.deltaTime = deltaTime;
 
   // Determine optimal simulation parameters
+  // 确定最佳模拟参数
   var area = this.width * this.height;
   this.numParticles = Math.pow((ndivsX + ndivsY) / 2 + 1, 2);
   this.material.mass = this.material.restDensity * area / this.numParticles;
