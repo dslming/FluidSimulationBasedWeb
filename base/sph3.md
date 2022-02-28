@@ -1,5 +1,7 @@
 > https://blog.csdn.net/m0_38055352/article/details/88377773
 
+> https://www.notion.so/Smoothed-Particle-Hydrodynamics-Particle-Based-Fluid-Simulation-for-Interactive-Applications-9061b2ec19de49e1857ec80fa30d1e50
+
 ### SPH
 
 #### 受力分析
