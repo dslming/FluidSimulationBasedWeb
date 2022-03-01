@@ -1,124 +1,9 @@
-/*
+import { Vector2 } from './Vector2.js'
+import { PI } from './tool.js'
 
-  SPH Fluid Simulation - Core Library
-
-  Source repository:
-  https://github.com/tommccracken/sph-fluid-simulation
-
-
-  Copyright 2020 Thomas O. McCracken
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-
-*/
-
-// Useful constants
-
-const PI = Math.PI;
-
-// Useful functions
-
-function deg2rad(deg) {
-  return deg * PI / 180;
-}
-
-function rad2deg(rad) {
-  return rad * 180 / PI;
-}
-
-function get_time() {
-  return Date.now();
-}
-
-function time_since(time) {
-  return (get_time() - time);
-}
 
 // Vector (2D) math class
 
-class Vector2 {
-
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-  }
-
-  magnitude_squared() {
-    return this.x * this.x + this.y * this.y;
-  }
-
-  magnitude() {
-    return Math.sqrt(this.magnitude_squared());
-  }
-
-  unit_vector() {
-    return new Vector2(this.x / this.magnitude(), this.y / this.magnitude());
-  }
-
-  add(v) {
-    return new Vector2(this.x + v.x, this.y + v.y);
-  }
-
-  add_to_this(v) {
-    this.x = this.x + v.x;
-    this.y = this.y + v.y;
-  }
-
-  subtract(v) {
-    return new Vector2(this.x - v.x, this.y - v.y);
-  }
-
-  subtract_from_this(v) {
-    this.x = this.x - v.x;
-    this.y = this.y - v.y;
-  }
-
-  scale(scalar) {
-    return new Vector2(scalar * this.x, scalar * this.y);
-  }
-
-  scale_this(scalar) {
-    this.x = scalar * this.x;
-    this.y = scalar * this.y;
-  }
-
-  set_to(v) {
-    this.x = v.x;
-    this.y = v.y;
-  }
-
-  set_to_zero() {
-    this.x = 0;
-    this.y = 0;
-  }
-
-  rotate_about(v, angle) {
-    let x,
-      y;
-    x = v.x + (this.x - v.x) * Math.cos(angle) - (this.y - v.y) * Math.sin(angle);
-    y = v.y + (this.x - v.x) * Math.sin(angle) + (this.y - v.y) * Math.cos(angle);
-    return new Vector2(x, y);
-  }
-
-  distance_from_squared(v) {
-    return (v.x - this.x) * (v.x - this.x) + (v.y - this.y) * (v.y - this.y);
-  }
-
-  distance_from(v) {
-    return Math.sqrt(this.distance_from_squared(v));
-  }
-
-}
 
 // Abstract world element class
 class AbstractWorldElement {
@@ -371,8 +256,7 @@ class Grid {
     }
     if (grid_index_y < 0) {
       grid_index_y = 0;
-    }
-    else if (grid_index_y > (this.grid_count_y - 1)) {
+    } else if (grid_index_y > (this.grid_count_y - 1)) {
       grid_index_y = this.grid_count_y - 1;
     }
     if (this.elements[grid_index_x][grid_index_y].particles.length < this.elements[grid_index_x][grid_index_y].size) {
@@ -482,7 +366,7 @@ class Grid {
 }
 
 
-class SpatialHash { // This spatial hash implementation is a work in progress (not very performant at this time) 
+class SpatialHash { // This spatial hash implementation is a work in progress (not very performant at this time)
 
   constructor(bin_size) {
     this.spatial_hash = {};
@@ -548,7 +432,7 @@ class SpatialHash { // This spatial hash implementation is a work in progress (n
 
 }
 
-class PhysicsWorld {
+export class PhysicsWorld {
 
   constructor(width, height, time_step, constraint_solver_iterations) {
     this.width = width;
@@ -562,13 +446,17 @@ class PhysicsWorld {
     this.steps = 0;
     this.gravitational_field = new Vector2(0, -9.81);
     this.constraint_solver_iterations = constraint_solver_iterations;
+
     this.simple_world_boundary_collisions = true;
     this.damping_coefficient = 0.00; // Not used for now
     this.particle_to_particle_collisions = true;
+
     this.particle_contact_radius = 0.1;
     this.SPH_spatial_partitioning = 1; // 0 = off, 1 = grid, 2 = spatial hash
     this.SPH_grid = null;
+
     this.SPH_smoothing_length = 1.0;
+
     if (this.SPH_spatial_partitioning == 1) {
       this.SPH_grid = new Grid(this.SPH_smoothing_length, this.width, this.height);
     }
@@ -733,7 +621,7 @@ class PhysicsWorld {
     }
 
     // Apply restitution (particle-boundary)
-    for (let particle of this.particles){
+    for (let particle of this.particles) {
       particle.calculate_velocity(this.time_step);
       if (this.simple_world_boundary_collisions) {
         if (particle.pos.y + particle.radius > this.height) {
@@ -897,26 +785,6 @@ class PhysicsWorld {
   integrate() {
     for (let particle of this.particles) {
       particle.integrate(this.time_step, this.damping_coefficient);
-    }
-  }
-
-}
-
-function create_fluid_cluster(pos_x, pos_y, angle, width, height, divisions_width, divisions_height, contact_radius, density, collides) {
-  var centre = new Vector2(pos_x, pos_y);
-  var particle_mass = density * width * height / (divisions_width + 1) / (divisions_height + 1);
-  // Note: density is in kg / sq. m
-  var spacing_width = width / divisions_width;
-  var spacing_height = height / divisions_height;
-  var radii = contact_radius;
-
-  for (var count = 0; count < divisions_height + 1; count++) {
-    for (var count2 = 0; count2 < divisions_width + 1; count2++) {
-      physics_world.create_particle((centre.x - width / 2) + count2 * spacing_width, (centre.y + height / 2) - count * spacing_height, 0, 0, 0, 0, 0, 0, particle_mass, radii, false);
-      physics_world.particles[physics_world.particles.length - 1].pos = physics_world.particles[physics_world.particles.length - 1].pos.rotate_about(centre, angle);
-      physics_world.particles[physics_world.particles.length - 1].pos_previous.set_to(physics_world.particles[physics_world.particles.length - 1].pos);
-      physics_world.particles[physics_world.particles.length - 1].SPH_particle = true;
-      physics_world.particles[physics_world.particles.length - 1].collides = collides;
     }
   }
 
