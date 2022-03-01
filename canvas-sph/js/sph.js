@@ -28,7 +28,7 @@ class SPH {
     this.box = box;
     this.eps = eps;
 
-    // 颗粒质量
+    // 颗粒质量 m = pv
     this.particleMass = Math.pow(this.dx, 2) * this.rho_0;
 
     this.generateLookupTable();

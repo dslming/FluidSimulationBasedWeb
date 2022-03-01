@@ -26,9 +26,12 @@ function main() {
 
   // 粒子间距
   const particleSpacing = 0.01136363636;
-  const supportRadius = Math.sqrt(
-    (Math.pow(particleSpacing, 2) * 20) / Math.PI
-  );
+  // const supportRadius = Math.sqrt(
+  //   (Math.pow(particleSpacing, 2) * 20) / Math.PI
+  // );
+  const supportRadius = 0.00000000457;
+  console.error(supportRadius);
+
 
   const gravity = Vec.new(0.0, -9.81);
   const restDensity = 1000;

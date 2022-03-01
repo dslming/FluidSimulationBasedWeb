@@ -9,3 +9,5 @@ npm install
 ```
 npm start
 ```
+
+$\textbf{Smoothed particle hydrodynamics}$
