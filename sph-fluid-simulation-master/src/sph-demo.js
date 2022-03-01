@@ -1,7 +1,6 @@
-import { PhysicsWorld } from './sph-library.js'
+import { PhysicsWorld, Grid, SpatialHash, ParticleContactConstraint } from './sph-library.js'
 import { Vector2 } from './Vector2.js'
 import { get_time } from './tool.js'
-
 window.onload = () => {
   // The HTML5 canvas elements
   const canvas = document.getElementById("SketchCanvas");
@@ -16,7 +15,7 @@ window.onload = () => {
   // Rendering scaling variables
   let draw_size;
   let draw_scaling_factor;
-  let debug_mode = false;
+  let debug_mode = true;
   let texture_size;
 
   // The physics world
@@ -30,8 +29,19 @@ window.onload = () => {
   let delta;
   let pointer_interaction_radius = 0;
 
+  // 簇
+  function create_fluid_cluster(
+    pos_x,
+    pos_y,
+    angle,
+    width,
+    height,
+    divisions_width,
+    divisions_height,
+    contact_radius,
+    density,
+    collides) {
 
-  function create_fluid_cluster(pos_x, pos_y, angle, width, height, divisions_width, divisions_height, contact_radius, density, collides) {
     var centre = new Vector2(pos_x, pos_y);
     var particle_mass = density * width * height / (divisions_width + 1) / (divisions_height + 1);
     // Note: density is in kg / sq. m
@@ -53,6 +63,7 @@ window.onload = () => {
 
   function reinitialise_spatial_partitioning() {
     let index = $("#spatial_partitioning_mode").prop('selectedIndex');
+    index = 1
     physics_world.SPH_spatial_partitioning = index;
     if (index === 1) {
       physics_world.SPH_grid = new Grid(physics_world.SPH_smoothing_length, physics_world.width, physics_world.height);
@@ -73,6 +84,7 @@ window.onload = () => {
         world_size = 10;
         physics_world = new PhysicsWorld(world_size, world_size, physics_period, 10);
         physics_world.gravitational_field.y = -9.81;
+
         create_fluid_cluster(3, 5, 0, 5, 7, 15, 25, physics_world.particle_contact_radius, 1000, true);
         physics_world.create_particle(6.5, 0.5, 0, 0, 0, 0, 0, 0, 1500, 0.5, true);
         physics_world.create_particle(6.5, 1.5, 0, 0, 0, 0, 0, 0, 1500, 0.5, true);
@@ -252,11 +264,11 @@ window.onload = () => {
       }
       // Draw a representation of the spatial partitioning data structure
       if (physics_world.SPH_spatial_partitioning === 1) { // Draw the grid
-        for (let i = 0; i < this.physics_world.SPH_grid.grid_count_x; i++) {
-          for (let j = 0; j < this.physics_world.SPH_grid.grid_count_y; j++) {
+        for (let i = 0; i < physics_world.SPH_grid.grid_count_x; i++) {
+          for (let j = 0; j < physics_world.SPH_grid.grid_count_y; j++) {
             ctx.beginPath();
-            ctx.moveTo(i * this.physics_world.SPH_grid.grid_size * draw_scaling_factor, world_size * draw_scaling_factor - j * this.physics_world.SPH_grid.grid_size * draw_scaling_factor - this.physics_world.SPH_grid.grid_size * draw_scaling_factor);
-            ctx.rect(i * this.physics_world.SPH_grid.grid_size * draw_scaling_factor, world_size * draw_scaling_factor - j * this.physics_world.SPH_grid.grid_size * draw_scaling_factor - this.physics_world.SPH_grid.grid_size * draw_scaling_factor, this.physics_world.SPH_grid.grid_size * draw_scaling_factor, this.physics_world.SPH_grid.grid_size * draw_scaling_factor);
+            ctx.moveTo(i * physics_world.SPH_grid.grid_size * draw_scaling_factor, world_size * draw_scaling_factor - j * physics_world.SPH_grid.grid_size * draw_scaling_factor - physics_world.SPH_grid.grid_size * draw_scaling_factor);
+            ctx.rect(i * physics_world.SPH_grid.grid_size * draw_scaling_factor, world_size * draw_scaling_factor - j * physics_world.SPH_grid.grid_size * draw_scaling_factor - physics_world.SPH_grid.grid_size * draw_scaling_factor, physics_world.SPH_grid.grid_size * draw_scaling_factor, physics_world.SPH_grid.grid_size * draw_scaling_factor);
             if (physics_world.SPH_grid.elements[i][j].size === 0) {
               ctx.fillStyle = 'rgba(53,53,53,0.2)';
               ctx.fill();
@@ -266,13 +278,13 @@ window.onload = () => {
           }
         }
       } else if (physics_world.SPH_spatial_partitioning > 1) { // Draw the spatial hash
-        for (let i = 0; i < this.physics_world.SPH_grid.size; i++) {
+        for (let i = 0; i < physics_world.SPH_grid.size; i++) {
           ctx.beginPath();
-          let coordinates = Object.keys(this.physics_world.SPH_grid.spatial_hash)[i].split(",");
+          let coordinates = Object.keys(physics_world.SPH_grid.spatial_hash)[i].split(",");
           let x = parseInt(coordinates[0]);
           let y = parseInt(coordinates[1]);
-          ctx.moveTo(x * this.physics_world.SPH_grid.bin_size * draw_scaling_factor, world_size * draw_scaling_factor - y * this.physics_world.SPH_grid.bin_size * draw_scaling_factor - this.physics_world.SPH_grid.bin_size * draw_scaling_factor);
-          ctx.rect(x * this.physics_world.SPH_grid.bin_size * draw_scaling_factor, world_size * draw_scaling_factor - y * this.physics_world.SPH_grid.bin_size * draw_scaling_factor - this.physics_world.SPH_grid.bin_size * draw_scaling_factor, this.physics_world.SPH_grid.bin_size * draw_scaling_factor, this.physics_world.SPH_grid.bin_size * draw_scaling_factor);
+          ctx.moveTo(x * physics_world.SPH_grid.bin_size * draw_scaling_factor, world_size * draw_scaling_factor - y * physics_world.SPH_grid.bin_size * draw_scaling_factor - physics_world.SPH_grid.bin_size * draw_scaling_factor);
+          ctx.rect(x * physics_world.SPH_grid.bin_size * draw_scaling_factor, world_size * draw_scaling_factor - y * physics_world.SPH_grid.bin_size * draw_scaling_factor - physics_world.SPH_grid.bin_size * draw_scaling_factor, physics_world.SPH_grid.bin_size * draw_scaling_factor, physics_world.SPH_grid.bin_size * draw_scaling_factor);
           ctx.strokeStyle = 'rgba(53,53,53,1)';
           ctx.stroke();
         }
@@ -296,9 +308,11 @@ window.onload = () => {
 
   function resize_canvas() {
     // Resize the canvas element to suit the current viewport size/shape
-    let viewport_width = $(window).width();
-    let viewport_height = $(window).height();
-    draw_size = Math.round(0.80 * Math.min(viewport_width, 0.85 * viewport_height));
+    let viewport_width = 500 //$(window).width();
+    let viewport_height = 500 //$(window).height();
+    // draw_size = Math.round(0.80 * Math.min(viewport_width, 0.85 * viewport_height));
+    draw_size = Math.min(viewport_height, viewport_width);
+
     // Recalculate the draw scaling factor
     draw_scaling_factor = draw_size / world_size;
     canvas.width = draw_size;
@@ -309,7 +323,7 @@ window.onload = () => {
     texture_canvas.width = texture_size;
     texture_canvas.height = texture_size;
     prepare_texture_canvas();
-    $('#max-width-box').width(draw_size);
+    // $('#max-width-box').width(draw_size);
     // Draw the world
     draw_world();
   }
@@ -319,7 +333,8 @@ window.onload = () => {
     scenes[0].loader()
 
     // Reinitialise the spatial partitioning mode
-    reinitialise_spatial_partitioning();
+    // 重新初始化空间分区模式
+    // reinitialise_spatial_partitioning();
     // Resize the canvas
     resize_canvas();
     // Set interaction radius of pointer

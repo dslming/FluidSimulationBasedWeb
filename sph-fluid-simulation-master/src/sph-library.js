@@ -156,7 +156,7 @@ class DistanceConstraint extends AbstractConstraint {
 
 }
 
-class ParticleContactConstraint extends DistanceConstraint {
+export class ParticleContactConstraint extends DistanceConstraint {
 
   constructor(p1, p2) {
     super(p1, p2, p1.radius + p2.radius, 1.0);
@@ -230,7 +230,7 @@ class PointConstraint extends AbstractConstraint {
 
 }
 
-class Grid {
+export class Grid {
 
   constructor(grid_size, width, height) {
     this.grid_size = grid_size;
@@ -366,7 +366,7 @@ class Grid {
 }
 
 
-class SpatialHash { // This spatial hash implementation is a work in progress (not very performant at this time)
+export class SpatialHash { // This spatial hash implementation is a work in progress (not very performant at this time)
 
   constructor(bin_size) {
     this.spatial_hash = {};
