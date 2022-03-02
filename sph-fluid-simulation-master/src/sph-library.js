@@ -487,12 +487,11 @@ export class PhysicsWorld {
 
     // 简单的世界边界碰撞
     this.simple_world_boundary_collisions = true;
-    this.damping_coefficient = 0.00; // Not used for now
     this.particle_to_particle_collisions = true;
 
     // 接触半径
     this.particle_contact_radius = 0.1;
-    this.SPH_spatial_partitioning = 0; // 0 = off, 1 = grid, 2 = spatial hash
+    this.SPH_spatial_partitioning = 1; // 0 = off, 1 = grid, 2 = spatial hash
     this.SPH_grid = null;
 
     this.SPH_smoothing_length = 1.0;
@@ -647,6 +646,7 @@ export class PhysicsWorld {
     }
   }
 
+  // 力的累加
   accumulate_forces() {
     this.calculate_gravitational_field_forces();
     this.calculate_fluid_forces();
@@ -667,6 +667,7 @@ export class PhysicsWorld {
     // 应用恢复（粒子边界）
     for (let particle of this.particles) {
       particle.calculate_velocity(this.time_step);
+
       if (this.simple_world_boundary_collisions) {
         if (particle.pos.y + particle.radius > this.height) {
           particle.vel.y = -particle.coefficient_of_restitution * particle.vel.y;
@@ -734,6 +735,7 @@ export class PhysicsWorld {
 
   calculate_gravitational_field_forces() {
     // Apply gravitational field accelerations (not forces)
+    // 应用重力场加速度（而不是力）
     for (let particle of this.particles) {
       particle.acc = particle.acc.add(this.gravitational_field);
     }
@@ -781,7 +783,7 @@ export class PhysicsWorld {
     // This initial fluid simulation implementation, using smoothed particle hydrodynamics (SPH), was generally based on the concepts outlined in the paper: Particle-based fluid simulation for interactive applications (Matthias Müller, David Charypar and Markus Gross) http://matthias-mueller-fischer.ch/publications/sca03.pdf
 
     // Calculate fluid densities and pressures
-
+    // 计算流体密度和压力
     for (let i = 0; i < this.particles.length; i++) {
       if (this.particles[i].SPH_particle == true) {
         if (this.particles[i].SPH_neighbours.length > 0) {
@@ -803,7 +805,7 @@ export class PhysicsWorld {
     }
 
     // Calculate pressure forces and viscosity forces
-
+    // 计算压力和粘性力
     for (let i = 0; i < this.particles.length; i++) {
       if (this.particles[i].SPH_particle == true) {
         for (let j = 0; j < this.particles[i].SPH_neighbours.length; j++) {
@@ -834,7 +836,7 @@ export class PhysicsWorld {
 
   integrate() {
     for (let particle of this.particles) {
-      particle.integrate(this.time_step, this.damping_coefficient);
+      particle.integrate(this.time_step);
     }
   }
 
