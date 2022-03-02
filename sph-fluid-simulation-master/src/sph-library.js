@@ -485,6 +485,7 @@ export class PhysicsWorld {
     this.gravitational_field = new Vector2(0, -9.81);
     this.constraint_solver_iterations = constraint_solver_iterations;
 
+    // 简单的世界边界碰撞
     this.simple_world_boundary_collisions = true;
     this.damping_coefficient = 0.00; // Not used for now
     this.particle_to_particle_collisions = true;
@@ -674,6 +675,7 @@ export class PhysicsWorld {
           particle.vel.y = -particle.coefficient_of_restitution * particle.vel.y;
           particle.pos.y = 0 + particle.radius;
         }
+
         if (particle.pos.x + particle.radius > this.width) {
           particle.vel.x = -particle.coefficient_of_restitution * particle.vel.x;
           particle.pos.x = this.width - particle.radius;
@@ -686,6 +688,7 @@ export class PhysicsWorld {
     }
 
     // Check whether constraint has broken, if so, delete
+    // 检查约束是否已断开，如果已断开，请删除
     let number_of_iterations = this.constraints.length;
     for (let i = 0; i < number_of_iterations; i++) {
       if (this.constraints[i].has_broken()) {
