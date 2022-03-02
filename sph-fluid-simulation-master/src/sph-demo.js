@@ -20,7 +20,7 @@ window.onload = () => {
 
   // The physics world
   var physics_world;
-  // The world size
+  // The world size,10*10
   let world_size;
 
   // Declare loop timing variables
@@ -51,9 +51,23 @@ window.onload = () => {
 
     for (var count = 0; count < divisions_height + 1; count++) {
       for (var count2 = 0; count2 < divisions_width + 1; count2++) {
-        physics_world.create_particle((centre.x - width / 2) + count2 * spacing_width, (centre.y + height / 2) - count * spacing_height, 0, 0, 0, 0, 0, 0, particle_mass, radii, false);
+        physics_world.create_particle(
+          (centre.x - width / 2) + count2 * spacing_width,
+          (centre.y + height / 2) - count * spacing_height,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          particle_mass,
+          radii,
+          false);
+
         physics_world.particles[physics_world.particles.length - 1].pos = physics_world.particles[physics_world.particles.length - 1].pos.rotate_about(centre, angle);
+
         physics_world.particles[physics_world.particles.length - 1].pos_previous.set_to(physics_world.particles[physics_world.particles.length - 1].pos);
+
         physics_world.particles[physics_world.particles.length - 1].SPH_particle = true;
         physics_world.particles[physics_world.particles.length - 1].collides = collides;
       }
@@ -82,14 +96,15 @@ window.onload = () => {
         physics_frequency = 100;
         physics_period = 1 / physics_frequency;
         world_size = 10;
-        physics_world = new PhysicsWorld(world_size, world_size, physics_period, 10);
+        physics_world = new PhysicsWorld(world_size, world_size, physics_period, 100);
         physics_world.gravitational_field.y = -9.81;
 
-        create_fluid_cluster(3, 5, 0, 5, 7, 15, 25, physics_world.particle_contact_radius, 1000, true);
+        create_fluid_cluster(0, 4, 0, 5, 7, 15, 25, physics_world.particle_contact_radius, 1000, true);
         physics_world.create_particle(6.5, 0.5, 0, 0, 0, 0, 0, 0, 1500, 0.5, true);
         physics_world.create_particle(6.5, 1.5, 0, 0, 0, 0, 0, 0, 1500, 0.5, true);
         physics_world.create_particle(6.5, 2.5, 0, 0, 0, 0, 0, 0, 1500, 0.5, true);
         physics_world.create_particle(6.5, 3.5, 0, 0, 0, 0, 0, 0, 1500, 0.5, true);
+        window.physics_world = physics_world
       }
 
     },
@@ -298,18 +313,19 @@ window.onload = () => {
     draw_world();
     time_now = get_time();
     delta = delta + (time_now - time_prev);
-    while (delta > (physics_period * 1000)) {
-      delta = delta - (physics_period * 1000);
-      physics_world.update();
-    }
+    // while (delta > (physics_period * 1000)) {
+    //   delta = delta - (physics_period * 1000);
+    // }
+    physics_world.update();
     time_prev = get_time();
     window.requestAnimationFrame(app_loop);
   }
+  window.app_loop = app_loop
 
   function resize_canvas() {
     // Resize the canvas element to suit the current viewport size/shape
-    let viewport_width = 500 //$(window).width();
-    let viewport_height = 500 //$(window).height();
+    let viewport_width = 800 //$(window).width();
+    let viewport_height = 400 //$(window).height();
     // draw_size = Math.round(0.80 * Math.min(viewport_width, 0.85 * viewport_height));
     draw_size = Math.min(viewport_height, viewport_width);
 

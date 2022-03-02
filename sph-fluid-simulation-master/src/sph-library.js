@@ -26,41 +26,67 @@ class AbstractWorldElement {
 
 }
 
+let id = 0;
+
 // Particle class
 class Particle extends AbstractWorldElement {
 
   constructor(px, py, vx, vy, ax, ay, fx, fy, mass, radius, fixed) {
+
     super();
+    this.id = id;
+    id += 1
+    if (px == undefined) {
+      console.error("error...", px, py);
+    }
+    // console.error(px, py);
+
     // The mass of the particle
     this.mass = mass;
     this.inv_mass = 1 / mass;
+
     // The radius of the particle
     this.radius = radius;
+
     // This property defines whether the particle is allowed to move
     this.fixed = fixed;
+
     // A vector representing the current position of the particle
     this.pos = new Vector2(px, py);
+
     // A vector representing the previous position of the particle (necessary for Verlet integration)
     this.pos_previous = new Vector2(px, py);
+
     // A vector representing the current velocity of the particle (can also be determined implicitly from pos and prev_pos)
     this.vel = new Vector2(vx, vy);
+
     // A vector representing the current acceleration of the particle (necessary for Verlet integration)
     this.acc = new Vector2(ax, ay);
+
     // A vector representing the net force acting on the particle
-    this.force = new Vector2(fx, fy); // Note: this is actually not being used at this time
+    // Note: this is actually not being used at this time
+    this.force = new Vector2(fx, fy);
+
     // Temporary integration variable (slight optimisation)
     this.temp_pos = new Vector2(px, py);
+
     // Represents whether a particle is permitted to collide with anything
+    // 表示是否允许粒子与任何物体发生碰撞
     this.collides = true;
-    // The lifetime of the particle
-    this.lifetime = null;
+
     // Co-efficient of restitution (particle-boundary)
+    // 恢复系数（粒子边界）
     this.coefficient_of_restitution = 0.3;
+
     // Indicates whether the particle is a SPH fluid particle
+    // 指示粒子是否为 SPH 流体粒子
     this.SPH_particle = false;
+
     // List of SPH fluid neighbours
     this.SPH_neighbours = [];
+
     // Interpolated density at SPH fluid particle
+    // SPH 流体粒子的插值密度
     this.SPH_density = 0;
   }
 
@@ -82,17 +108,22 @@ class Particle extends AbstractWorldElement {
 
   calculate_velocity(time_step) {
     this.vel = (this.pos.subtract(this.pos_previous)).scale(1 / time_step);
+    this.vel.x *= 0.9999;
+    this.vel.y *= 0.9999;
   }
 
 }
 
+// 约束
 class AbstractConstraint extends AbstractWorldElement {
 
   constructor() {
     super();
     // Defines whether the constraint can be broken
+    // 定义是否可以打破约束
     this.breakable = false;
     // The maximum allowable breaking strain of the constraint
+    // 约束的最大允许断裂应变
     this.breaking_strain = 2.0;
   }
 
@@ -156,6 +187,7 @@ class DistanceConstraint extends AbstractConstraint {
 
 }
 
+// 接触约束粒子
 export class ParticleContactConstraint extends DistanceConstraint {
 
   constructor(p1, p2) {
@@ -249,6 +281,7 @@ export class Grid {
   add_item(particle) {
     let grid_index_x = Math.floor(particle.pos.x / this.grid_size);
     let grid_index_y = Math.floor(particle.pos.y / this.grid_size);
+
     if (grid_index_x < 0) {
       grid_index_x = 0;
     } else if (grid_index_x > (this.grid_count_x - 1)) {
@@ -258,6 +291,11 @@ export class Grid {
       grid_index_y = 0;
     } else if (grid_index_y > (this.grid_count_y - 1)) {
       grid_index_y = this.grid_count_y - 1;
+    }
+
+    if (this.elements[grid_index_x] === undefined) {
+      console.error(grid_index_x, grid_index_y);
+
     }
     if (this.elements[grid_index_x][grid_index_y].particles.length < this.elements[grid_index_x][grid_index_y].size) {
       this.elements[grid_index_x][grid_index_x].particles.push(particle);
@@ -434,7 +472,7 @@ export class SpatialHash { // This spatial hash implementation is a work in prog
 
 export class PhysicsWorld {
 
-  constructor(width, height, time_step, constraint_solver_iterations) {
+  constructor(width, height, time_step, constraint_solver_iterations = 10) {
     this.width = width;
     this.height = height;
     this.time_step = time_step;
@@ -451,8 +489,9 @@ export class PhysicsWorld {
     this.damping_coefficient = 0.00; // Not used for now
     this.particle_to_particle_collisions = true;
 
+    // 接触半径
     this.particle_contact_radius = 0.1;
-    this.SPH_spatial_partitioning = 1; // 0 = off, 1 = grid, 2 = spatial hash
+    this.SPH_spatial_partitioning = 0; // 0 = off, 1 = grid, 2 = spatial hash
     this.SPH_grid = null;
 
     this.SPH_smoothing_length = 1.0;
@@ -498,6 +537,7 @@ export class PhysicsWorld {
     this.constraints.push(new PointConstraint(p1, x, y, stiffness));
   }
 
+  // 接触约束
   create_particle_contact_constraint(p1, p2) {
     this.constraints.push(new ParticleContactConstraint(p1, p2));
   }
@@ -551,7 +591,7 @@ export class PhysicsWorld {
   update() {
     this.clean_up();
     this.accumulate_forces();
-    this.collision_detection_and_response();
+    // this.collision_detection_and_response();
     this.constraint_resolution();
     this.integrate();
     this.time = this.time + this.time_step;
@@ -611,7 +651,9 @@ export class PhysicsWorld {
     this.calculate_fluid_forces();
   }
 
+  // 约束与分辨率
   constraint_resolution() {
+    // 强制所有约束，重复指定的约束求解器迭代次数
     // Enforce all constraints, repeat for as many constraint solver iterations have been specified
     for (let i = 0; i < this.constraint_solver_iterations; i++) {
       // Enforce constraints
@@ -621,6 +663,7 @@ export class PhysicsWorld {
     }
 
     // Apply restitution (particle-boundary)
+    // 应用恢复（粒子边界）
     for (let particle of this.particles) {
       particle.calculate_velocity(this.time_step);
       if (this.simple_world_boundary_collisions) {
@@ -658,13 +701,17 @@ export class PhysicsWorld {
     }
   }
 
+
+  // 碰撞检测与响应
   collision_detection_and_response() {
     let particle_index = 0;
     let particle2_index = 0;
+
     for (let particle of this.particles) {
       // Only proceed if a particle is allowed to collide
       if (particle.collides) {
         // First check for particle-particle collisions (but only proceed if current particle is allowed to collide with another particle)
+        // 首先检查粒子碰撞（但仅当允许当前粒子与另一个粒子碰撞时才继续）
         if (this.particle_to_particle_collisions) {
           particle2_index = 0;
           for (let particle2 of this.particles) {
