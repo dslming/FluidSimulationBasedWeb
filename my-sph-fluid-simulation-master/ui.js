@@ -1,5 +1,5 @@
 import { Vector2 } from './src/Vector2.js'
-
+import { GUI } from './lib/lil-gui.module.min.js'
 let pointer_x = 0;
 let pointer_y = 0;
 let physics_world
@@ -90,7 +90,7 @@ export function initEvent(physicsWorld, _draw_scaling_factor, _world_size, _glas
 
 
 
-  var gui = new dat.GUI;
+  var gui = new GUI;
   var folder = gui.addFolder('旋转');
   const options = {
     rotation: 0
