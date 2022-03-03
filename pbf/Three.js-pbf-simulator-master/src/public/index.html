@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Three.js Webpack ES6 Boilerplate</title>
+
+    <link rel="stylesheet" type="text/css" href="./assets/css/app.css">
+  </head>
+
+  <body>
+    <section id="appContainer" class="main">
+      <!-- <div id="loading">Loading...</div> -->
+    </section>
+
+    <script src="./assets/js/rStats.js"></script>
+    <script src="./assets/js/rStats.extras.js"></script>
+    <script src="./assets/js/dat.gui.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+
+    <!-- Shaders -->
+    <script type="x-shader/x-vertex" id="vertexshader">
+
+      // switch on high precision floats
+      #ifdef GL_ES
+      precision highp float;
+      #endif
+
+      uniform float delta;
+      uniform vec3 velocity;
+      uniform vec3 newPosition;
+
+      varying vec3 vPosition;
+      varying vec3 vVelocity;
+      varying vec3 vNormal;
+      varying vec3 dir2Camera;
+
+      void main()
+      {
+        gl_PointSize = 10.;
+        vNormal = normal;
+        vPosition = position + newPosition;
+        vVelocity = velocity;
+        dir2Camera = cameraPosition - position;
+
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position + newPosition, 1.0);
+      }
+    </script>
+
+    <script type="x-shader/x-fragment" id="fragmentshader">
+
+      #ifdef GL_ES
+      precision highp float;
+      #endif
+
+      uniform vec3 pointLight;
+      uniform vec3 ambientLight;
+
+      uniform vec3 diffuse;
+
+      varying vec3 vPosition;
+      varying vec3 vVelocity;
+
+      varying vec3 vNormal;
+      varying vec3 dir2Camera;
+
+      vec3 phong(vec3 L, vec3 V, vec3 N, vec3 specular_color, float specular_exponent) {
+
+          vec3 Rm = 2.0 * clamp(dot(L, N), .0001, .9999) * N - L;
+          vec3 Ip = clamp(dot(L, N), .0001, .9999) * diffuse + pow(clamp(dot(Rm, V), .0001, .9999), specular_exponent) * specular_color;
+
+          return Ip;
+      }
+
+      vec3 diffuseTranslucency(float attenuation, vec3 L, vec3 N, vec3 lightColor, vec3 translucentColor) {
+        // Computation of the translucent illumination:
+        // attenuation * lightColor * translucentColor * max(0, dot(light, -normal))
+        vec3 translucency = attenuation *
+                            lightColor *
+                            translucentColor *
+                            max(0.0, dot(L, -N));
+        return translucency;
+      }
+
+      vec3 forwardTranslucency(float attenuation, vec3 L, vec3 V, vec3 N, vec3 lightColor, vec3 translucentColor) {
+        vec3 translucency;
+        // Check light source direction.
+        if (dot(N, L) > 0.0) {
+          // No forwand translucency
+          translucency = vec3(0.0);
+        } else {
+          // Add forward translucency
+          translucency = attenuation *
+                         lightColor *
+                         translucentColor *
+                         pow(max(0.0, dot(-L, V)), 0.5);
+        }
+        return translucency;
+      }
+
+      void main()
+      {
+        vec3 specularColor = vec3(1.0, 1.0, 1.0);
+        float specularExponent = 10.;
+
+        vec3 lightColor = vec3(0.1, 0.1, 0.1);
+        vec3 dtColor = vec3(173.0 / 255.0, 230.0 / 255.0, 255.0 / 255.0);
+        vec3 ftColor = vec3(0.0 / 255.0, 255.0 / 255.0, 0.0 / 255.0);;
+
+        vec3 vToLight = pointLight - vPosition;
+        // Let attenuation be affected by the velocity;
+        float attenuation = (15.0 + length(vVelocity)) / (0.01 + length(vToLight));
+
+        // Normalizing
+        vec3 nLight = normalize(vToLight);
+        vec3 nCamera = normalize(dir2Camera);
+        vec3 normal = normalize(vNormal);
+
+        vec3 phongColor = phong(nLight, nCamera, normal, specularColor, specularExponent);
+        vec3 dTranslucency = diffuseTranslucency(attenuation, nLight, normal, lightColor, dtColor);
+        vec3 fTranslucency = forwardTranslucency(attenuation, nLight, nCamera, normal, lightColor, dtColor);
+
+        // feed into our frag colour
+        gl_FragColor = vec4(lightColor + attenuation * phongColor + dTranslucency + fTranslucency, 1.0);
+      }
+    </script>
+    <!-- End Shaders -->
+
+    <script src="./assets/js/app.js"></script>
+  </body>
+</html>
