@@ -30,7 +30,8 @@ export class Grid {
     }
 
     if (this.elements[grid_index_x] === undefined) {
-      console.error(grid_index_x, grid_index_y);
+      // console.error(grid_index_x, grid_index_y);
+      return;
 
     }
     if (this.elements[grid_index_x][grid_index_y].particles.length < this.elements[grid_index_x][grid_index_y].size) {
@@ -62,6 +63,13 @@ export class Grid {
     } else if (y > (this.grid_count_y - 1)) {
       y = this.grid_count_y - 1;
     }
+
+    if (this.elements[x] === undefined) {
+      // console.error(grid_index_x, grid_index_y);
+      return;
+
+    }
+
     for (let i = 0; i < this.elements[x][y].size; i++) {
       let distance_apart_squared = Math.pow(p.pos.x - this.elements[x][y].particles[i].pos.x, 2) + Math.pow(p.pos.y - this.elements[x][y].particles[i].pos.y, 2);
       if (distance_apart_squared < this.grid_size_squared) {

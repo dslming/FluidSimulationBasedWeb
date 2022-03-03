@@ -7,6 +7,7 @@ import { Vector2 } from './src/Vector2.js'
 import { get_time } from './src/Tool.js'
 
 import { initEvent } from './ui.js'
+import { Glass } from './src/Glass.js'
 
 window.onload = () => {
   // The HTML5 canvas elements
@@ -22,9 +23,10 @@ window.onload = () => {
   // Rendering scaling variables
   let draw_size;
   let draw_scaling_factor;
-  let debug_mode = true;
+  let debug_mode = false;
   let texture_size;
 
+  let glass;
   // The physics world
   var physics_world;
   // The world size,10*10
@@ -103,14 +105,16 @@ window.onload = () => {
         physics_frequency = 100;
         physics_period = 1 / physics_frequency;
         world_size = 10;
-        physics_world = new PhysicsWorld(world_size, world_size, physics_period, 100);
+        glass = new Glass({ width: 3, height: 4, centerX: 6, centerY: 6 });
+        window.glass = glass;
+        physics_world = new PhysicsWorld(world_size, world_size, physics_period, 100, glass);
         physics_world.gravitational_field.y = -9.81;
 
-        create_fluid_cluster(0, 4, 0, 5, 7, 15, 25, physics_world.particle_contact_radius, 1000, true);
-        physics_world.create_particle(6.5, 0.5, 0, 0, 0, 0, 0, 0, 1500, 0.5, true);
-        physics_world.create_particle(6.5, 1.5, 0, 0, 0, 0, 0, 0, 1500, 0.5, true);
-        physics_world.create_particle(6.5, 2.5, 0, 0, 0, 0, 0, 0, 1500, 0.5, true);
-        physics_world.create_particle(6.5, 3.5, 0, 0, 0, 0, 0, 0, 1500, 0.5, true);
+        create_fluid_cluster(6, 6, 0, 2, 3, 5, 10, physics_world.particle_contact_radius, 1000, true);
+        // physics_world.create_particle(6.5, 0.5, 0, 0, 0, 0, 0, 0, 1500, 0.5, true);
+        // physics_world.create_particle(6.5, 1.5, 0, 0, 0, 0, 0, 0, 1500, 0.5, true);
+        // physics_world.create_particle(6.5, 2.5, 0, 0, 0, 0, 0, 0, 1500, 0.5, true);
+        // physics_world.create_particle(6.5, 3.5, 0, 0, 0, 0, 0, 0, 1500, 0.5, true);
         window.physics_world = physics_world
       }
 
@@ -242,6 +246,7 @@ window.onload = () => {
         ctx.stroke();
       }
       if (debug_mode) {
+        ctx.lineWidth = "1";
         if (physics_world.particles[count].SPH_particle) {
           ctx.beginPath();
           ctx.strokeStyle = 'rgba(53,53,53,1)';
@@ -266,6 +271,8 @@ window.onload = () => {
         ctx.font = draw_size * 0.03 + 'px ariel';
         ctx.fillText(count, physics_world.particles[count].pos.x * draw_scaling_factor - 4, world_size * draw_scaling_factor - physics_world.particles[count].pos.y * draw_scaling_factor + 3);
       }
+
+
     }
     // Draw remaining debug information
     if (debug_mode) {
@@ -312,6 +319,24 @@ window.onload = () => {
         }
       }
     }
+
+    // draw glass
+    if (glass) {
+      ctx.beginPath();
+      ctx.lineWidth = "6";
+      ctx.strokeStyle = 'rgba(255,0,0,1)';
+      const points = glass.getDrawInfo()
+      for (let i = 0; i < points.length - 1; i++) {
+        ctx.moveTo(
+          points[i].x * draw_scaling_factor,
+          10 * draw_scaling_factor - points[i].y * draw_scaling_factor);
+
+        ctx.lineTo(
+          points[i + 1].x * draw_scaling_factor,
+          10 * draw_scaling_factor - points[i + 1].y * draw_scaling_factor)
+      }
+      ctx.stroke();
+    }
     canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
     canvas.getContext('2d').drawImage(offscreen_canvas, 0, 0);
   }
@@ -355,7 +380,7 @@ window.onload = () => {
     // Load the currently selected scene
     scenes[0].loader()
     resize_canvas();
-    initEvent(physics_world, draw_size / world_size, world_size)
+    initEvent(physics_world, draw_size / world_size, world_size, glass)
     // Reinitialise the spatial partitioning mode
     // 重新初始化空间分区模式
     // reinitialise_spatial_partitioning();

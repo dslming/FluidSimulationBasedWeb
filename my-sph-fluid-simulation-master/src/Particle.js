@@ -83,8 +83,8 @@ export class Particle extends AbstractWorldElement {
 
   calculate_velocity(time_step) {
     this.vel = (this.pos.subtract(this.pos_previous)).scale(1 / time_step);
-    this.vel.x *= 0.9999;
-    this.vel.y *= 0.9999;
+    // this.vel.x *= 0.9999;
+    // this.vel.y *= 0.9999;
   }
 
 }

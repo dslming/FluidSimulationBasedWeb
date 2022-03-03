@@ -8,7 +8,7 @@ let world_size
 let pointer_point_constraint = null;
 let pointer_state = 0;
 let pointer_interaction_radius
-
+let glass;
 
 function start_drag() {
   pointer_state = 1;
@@ -57,30 +57,51 @@ function pointer_move() {
   }
 }
 
-export function initEvent(physicsWorld, _draw_scaling_factor, _world_size) {
+export function initEvent(physicsWorld, _draw_scaling_factor, _world_size, _glass) {
+  glass = _glass;
   draw_scaling_factor = _draw_scaling_factor;
   physics_world = physicsWorld;
   world_size = _world_size;
   // Set interaction radius of pointer
   pointer_interaction_radius = 0.1 * physics_world.width;
 
-  document.getElementById("SketchCanvas").addEventListener("mousedown", function(ev) {
-    pointer_x = (ev.pageX - ev.target.offsetLeft) / draw_scaling_factor;
-    pointer_y = world_size - (ev.pageY - ev.target.offsetTop) / draw_scaling_factor;
-    start_drag();
-  }, false);
+  // document.getElementById("SketchCanvas").addEventListener("mousedown", function(ev) {
+  //   pointer_x = (ev.pageX - ev.target.offsetLeft) / draw_scaling_factor;
+  //   pointer_y = world_size - (ev.pageY - ev.target.offsetTop) / draw_scaling_factor;
+  //   start_drag();
+  // }, false);
 
-  document.getElementById("SketchCanvas").addEventListener("mouseleave", function(ev) {
-    stop_drag();
-  }, false);
+  // document.getElementById("SketchCanvas").addEventListener("mouseleave", function(ev) {
+  //   stop_drag();
+  // }, false);
 
-  document.getElementById("SketchCanvas").addEventListener("mousemove", function(ev) {
-    pointer_x = (ev.pageX - ev.target.offsetLeft) / draw_scaling_factor;
-    pointer_y = world_size - (ev.pageY - ev.target.offsetTop) / draw_scaling_factor;
-    pointer_move();
-  }, false);
+  // document.getElementById("SketchCanvas").addEventListener("mousemove", function(ev) {
+  //   pointer_x = (ev.pageX - ev.target.offsetLeft) / draw_scaling_factor;
+  //   pointer_y = world_size - (ev.pageY - ev.target.offsetTop) / draw_scaling_factor;
+  //   pointer_move();
+  // }, false);
 
-  document.getElementById("SketchCanvas").addEventListener("mouseup", function(ev) {
-    stop_drag()
-  }, false);
+  // document.getElementById("SketchCanvas").addEventListener("mouseup", function(ev) {
+  //   stop_drag()
+  // }, false);
+
+
+
+
+
+
+  var gui = new dat.GUI;
+  var folder = gui.addFolder('旋转');
+  const options = {
+    rotation: 0
+  }
+  folder.add(options, 'rotation', 0.0, 180.0).step(0.0001).onChange(function(value) {
+    if (glass) {
+      glass.rotation = value * Math.PI / 180
+    }
+  });
+  folder.open();
 }
+
+
+// glass.rotation = -60 * Math.PI / 180

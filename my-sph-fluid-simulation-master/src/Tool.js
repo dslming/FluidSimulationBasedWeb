@@ -19,3 +19,14 @@ export function get_time() {
 export function time_since(time) {
   return (get_time() - time);
 }
+
+
+function area2(p, q, s) {
+  return p.x * q.y - p.y * q.x +
+    q.x * s.y - q.y * s.x +
+    s.x * p.y - s.y * p.x;
+}
+
+export function toLeftTest(p, q, s) {
+  return area2(p, q, s) > 0;
+}

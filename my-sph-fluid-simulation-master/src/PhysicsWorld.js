@@ -11,7 +11,8 @@ import { Grid } from './Grid.js'
 
 export class PhysicsWorld {
 
-  constructor(width, height, time_step, constraint_solver_iterations = 10) {
+  constructor(width, height, time_step, constraint_solver_iterations = 10, glass) {
+    this.glass = glass;
     this.width = width;
     this.height = height;
     this.time_step = time_step;
@@ -212,6 +213,8 @@ export class PhysicsWorld {
     for (let particle of this.particles) {
       particle.calculate_velocity(this.time_step);
 
+      this.glass.handle(particle)
+
       if (this.simple_world_boundary_collisions) {
         if (particle.pos.y + particle.radius > this.height) {
           particle.vel.y = -particle.coefficient_of_restitution * particle.vel.y;
@@ -228,7 +231,9 @@ export class PhysicsWorld {
           particle.vel.x = -particle.coefficient_of_restitution * particle.vel.x;
           particle.pos.x = 0 + particle.radius;
         }
-        particle.pos_previous = particle.pos.subtract(particle.vel.scale(this.time_step));
+
+
+        // particle.pos_previous = particle.pos.subtract(particle.vel.scale(this.time_step));
       }
     }
 
