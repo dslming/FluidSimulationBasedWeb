@@ -1,5 +1,5 @@
 import { PhysicsWorld, } from './src/PhysicsWorld.js'
-import { ParticleContactConstraint } from './src/ParticleContactConstraint.js'
+import { ParticleContactConstraint } from './src/contraint/ParticleContactConstraint.js'
 import { Grid } from './src/Grid.js'
 import { SpatialHash } from './src/SpatialHash.js'
 

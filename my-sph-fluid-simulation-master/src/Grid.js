@@ -1,5 +1,3 @@
-import { Vector2 } from './Vector2.js'
-
 export class Grid {
 
   constructor(grid_size, width, height) {

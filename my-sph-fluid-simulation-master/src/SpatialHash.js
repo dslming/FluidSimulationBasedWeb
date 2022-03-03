@@ -1,4 +1,5 @@
-export class SpatialHash { // This spatial hash implementation is a work in progress (not very performant at this time)
+// This spatial hash implementation is a work in progress (not very performant at this time)
+export class SpatialHash {
 
   constructor(bin_size) {
     this.spatial_hash = {};

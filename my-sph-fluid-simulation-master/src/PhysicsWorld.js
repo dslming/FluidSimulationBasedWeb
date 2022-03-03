@@ -1,11 +1,13 @@
-import { Vector2 } from './Vector2.js'
 import { PI } from './Tool.js'
+import { Vector2 } from './Vector2.js'
 import { Particle } from './Particle.js'
-import { DistanceConstraint } from './DistanceConstraint.js'
-import { ParticleContactConstraint } from './ParticleContactConstraint.js'
+
+import { PointConstraint } from './contraint/PointConstraint.js'
+import { DistanceConstraint } from './contraint/DistanceConstraint.js'
+import { ParticleContactConstraint } from './contraint/ParticleContactConstraint.js'
+
 import { SpatialHash } from './SpatialHash.js'
 import { Grid } from './Grid.js'
-import { PointConstraint } from './PointConstraint.js'
 
 export class PhysicsWorld {
 
@@ -19,18 +21,23 @@ export class PhysicsWorld {
     this.boundaries = [];
     this.time = 0;
     this.steps = 0;
+    // 重力场
     this.gravitational_field = new Vector2(0, -9.81);
+    // 约束求解器迭代
     this.constraint_solver_iterations = constraint_solver_iterations;
 
     // 简单的世界边界碰撞
     this.simple_world_boundary_collisions = true;
+    // 粒子到粒子碰撞
     this.particle_to_particle_collisions = true;
 
     // 接触半径
     this.particle_contact_radius = 0.1;
+    // 空间划分
     this.SPH_spatial_partitioning = 1; // 0 = off, 1 = grid, 2 = spatial hash
     this.SPH_grid = null;
 
+    // 光滑半径
     this.SPH_smoothing_length = 1.0;
 
     if (this.SPH_spatial_partitioning == 1) {
@@ -284,12 +291,14 @@ export class PhysicsWorld {
 
     if (this.SPH_spatial_partitioning > 0) {
       // Populate the spatial data structure
+      // 填充空间数据结构
       for (let i = 0; i < this.particles.length; i++) {
         if (this.particles[i].SPH_particle) {
           this.SPH_grid.add_item(this.particles[i]);
         }
       }
       // Query the spatial data structure for neighbours
+      // 查询邻居的空间数据结构
       for (let i = 0; i < this.particles.length; i++) {
         this.SPH_grid.retrieve_items(this.particles[i]);
       }
@@ -325,6 +334,7 @@ export class PhysicsWorld {
       if (this.particles[i].SPH_particle == true) {
         if (this.particles[i].SPH_neighbours.length > 0) {
           for (let j = 0; j < (this.particles[i].SPH_neighbours.length); j++) {
+            // 距离平方
             let distance_apart_squared = Math.pow(this.particles[i].pos.x - this.particles[i].SPH_neighbours[j].pos.x, 2) + Math.pow(this.particles[i].pos.y - this.particles[i].SPH_neighbours[j].pos.y, 2);
             // W_density = 315 / (64 * pi * h ^ 9) * (h ^ 2 - r ^ 2) ^ 3 based on referenced paper
             // To-do: Renormalise this for a 2D domain
