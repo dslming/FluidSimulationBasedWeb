@@ -1,0 +1,884 @@
+<html>
+
+<head>
+<title>GPU MC & SPH</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<script type="text/javascript" src="js/glMatrix-0.9.5.min.js"></script>
+<script type="text/javascript" src="js/webgl-utils.js"></script>
+<script type="text/javascript" src="js/dat.gui.js"></script>
+<script type="text/javascript" src="js/utils-MC.js"></script>
+<script type="text/javascript" src="js/controller.js"></script>
+<script type="text/javascript" src="js/sph-mc.js"></script>
+
+<!-- Vertex shader-->
+<script id="vs-initData" type="x-shader/x-vertex">
+    attribute vec2 aV2I;
+    attribute vec3 aVD;
+    varying vec3 vD;
+    varying float vT;
+    void main(void) {
+		vD = aVD;
+        gl_PointSize = 1.0;
+		gl_Position = vec4(2. * aV2I - vec2(1.), 0.0, 1.0);
+	}
+</script>
+
+<script id="vs-index2D" type="x-shader/x-vertex">
+    attribute vec2 aV2I;
+    varying vec2 vV2I;
+    void main(void) {
+		vV2I = aV2I;
+        gl_PointSize = 1.0;
+		gl_Position = vec4(2. * aV2I - vec2(1.), 0.0, 1.0);
+	}
+</script>
+
+<script id="vs-index2DPyramid" type="x-shader/x-vertex">
+    attribute vec2 aV2I;
+    attribute float aVI;
+    varying float vVI;
+    void main(void) {
+		vVI = aVI;
+        gl_PointSize = 1.0;
+		gl_Position = vec4(2. * aV2I - vec2(1.), 0.0, 1.0);
+	}
+</script>
+
+<script id="vs-index3D" type="x-shader/x-vertex">
+    attribute vec2 aV2I;
+    uniform highp sampler2D uPT;
+    uniform float uSize;
+    varying vec2 vV2I;
+    varying vec3 vPos;
+    void main(void) {
+        vV2I = aV2I;
+        vPos = texture2D(uPT, aV2I).rgb;
+		vec3 gPP = floor(vPos * 128.);
+		vec2 gP =  0.001953125 * (gPP.xy + 128. * vec2(mod(gPP.z, 8.), floor(gPP.z * 0.125)) + vec2(0.5)) - vec2(1.);
+		gl_PointSize = uSize;
+		gl_Position = vec4(gP, 0., 1.0);
+	}
+</script>
+
+<script id="vs-renderParticles" type="x-shader/x-vertex">
+	attribute vec2 aV2I;
+	uniform mat4 uCameraMatrix;
+	uniform mat4 uPMatrix;
+	uniform highp sampler2D uPT;
+    uniform float uIntensity;
+    uniform float uSize;
+    varying vec4 vColor;
+    void main(void) {
+        vec4 data = texture2D(uPT, aV2I);
+        vec4 pos = vec4(data.rgb, 1.);
+        vColor = vec4(vec3(1.) * uIntensity, 1.);
+		gl_Position = uPMatrix * uCameraMatrix * pos;
+		gl_PointSize = uSize;
+	}
+</script>
+
+<script id="vs-simplePlane" type="x-shader/x-vertex">
+    attribute float aVI;
+    varying vec2 vText;
+    void main(void) {
+        float vI = aVI + 1.;
+	    vec2 xy = vec2(mod(vI, 2.) == 0. ? 1. : -1., -1. + 2. * step(-vI, -2.1));
+	    vText = xy * 0.5 + 0.5;
+	    gl_Position = vec4(xy, 0.0, 1.0);
+	}
+</script>
+
+<script id="vs-triangleIndexes" type="x-shader/x-vertex">
+    attribute float aVI;
+    attribute vec2 aV2I;
+    varying vec4 vColor;
+    void main(void) {
+        vColor = vec4(aVI);
+        gl_PointSize = 1.0;
+	    gl_Position = vec4(aV2I, 0.0, 1.0);
+	}
+</script>
+
+<script id="vs-render" type="x-shader/x-vertex">
+	attribute vec2 aV2I;
+	uniform mat4 uCameraMatrix;
+	uniform mat4 uPMatrix;
+	uniform highp sampler2D uPT;
+	uniform float uTransparency;
+	varying vec3 vPos;
+	varying vec3 vNor;
+	varying vec4 vColor;
+    void main(void) {
+        vec4 data = texture2D(uPT, aV2I);
+        vec3 read = data.rgb;
+        vNor = floor(read * 0.1) * .001;
+        vPos = fract(read);
+        vColor = vec4(vec3(1.), uTransparency);
+		gl_Position = uPMatrix * uCameraMatrix * vec4(vPos, 1.0);
+	}
+</script>
+
+<script id="vs-box" type="x-shader/x-vertex">
+    attribute vec3 aPosition;
+    uniform mat4 uCameraMatrix;
+    uniform mat4 uPMatrix;
+    varying vec4 vColor;
+    void main(void) {
+        vec3 pos = vec3(0.97 * aPosition.x + 0.02, aPosition.y + 0.01, 0.49 * aPosition.z);
+        vColor = vec4(1.);
+        gl_Position = uPMatrix * uCameraMatrix * vec4(pos, 1.0);
+    }
+</script>
+
+<script id="vs-sphere" type="x-shader/x-vertex">
+    attribute vec3 aPosition;
+    attribute vec3 aNorm;
+    uniform mat4 uCameraMatrix;
+    uniform mat4 uPMatrix;
+    varying vec4 vColor;
+    varying vec3 vNor;
+    uniform float uX;
+    void main(void) {
+        vec3 pos = vec3(aPosition.x + uX, aPosition.yz);
+        vColor = vec4(0., 0., 0., 1.);
+        vNor = aNorm;
+        gl_Position = uPMatrix * uCameraMatrix * vec4(pos, 1.0);
+    }
+</script>
+
+<!-- Fragment shader-->
+<script id="fs-initData" type="x-shader/x-fragment">
+    precision highp float;
+    varying vec3 vD;
+    void main(void) {
+        gl_FragColor = vec4(vD, 1.);
+    }
+</script>
+
+<script id="fs-medianData" type="x-shader/x-fragment">
+    precision highp float;
+    uniform highp sampler2D uDT;
+    uniform float uAlpha;
+    varying vec2 vV2I;
+    void main(void) {
+        gl_FragColor = vec4(texture2D(uDT, vV2I).rgb, uAlpha);
+    }
+</script>
+
+<script id="fs-simpleColor" type="x-shader/x-fragment">
+    precision highp float;
+    varying vec4 vColor;
+    void main(void) {
+        gl_FragColor = vColor;
+    }
+</script>
+
+<script id="fs-density" type="x-shader/x-fragment">
+    precision highp float;
+	precision highp sampler2D;
+    uniform sampler2D uPT;
+    uniform sampler2D uMPT;
+    uniform vec3 uNeighbords[125];
+    uniform float uMass;
+	uniform float uMaxSearchRatio;
+	uniform float uWeightDefaultConstant;
+    varying vec2 vV2I;
+    void main(void) {
+        vec3 pP = texture2D(uPT, vV2I).rgb;
+		vec3 gPP= floor(128. * pP);
+		float den = 0.0;
+		for(int i = 0; i < 27; i++) {
+			vec3 nGP = gPP + uNeighbords[i];
+			vec4 nGD = texture2D(uMPT, 0.0009765625 * (nGP.xy + 128. * vec2(mod(nGP.z, 8.), floor(nGP.z * 0.125)) + vec2(0.5)));
+			nGD.rgb /= max(nGD.a, 1.);
+	        float r = length(pP - nGD.rgb);
+		    float rD = max(uMaxSearchRatio * uMaxSearchRatio - r * r, 0.);
+		    den += nGD.a * rD * rD * rD;
+		}
+		gl_FragColor = vec4(0., 0., 0., den * uMass * uWeightDefaultConstant);
+	}
+</script>
+
+<script id="fs-mDensity" type="x-shader/x-fragment">
+    precision highp float;
+    uniform highp sampler2D uDT;
+    varying vec2 vV2I;
+    void main(void) {
+        gl_FragColor = vec4(0., 0., 0., texture2D(uDT, vV2I).a);
+    }
+</script>
+
+<script id="fs-lagrange" type="x-shader/x-fragment">
+    precision highp float;
+	precision highp sampler2D;
+	uniform float uMaxSearchRatio;
+	uniform float uWeightPressureConstant;
+	uniform float uWeightViscosityConstant;
+	uniform float uLambnaWeightDefaultConstant;
+	uniform float uK;
+	uniform float uViscosity;
+	uniform float uDeltaT;
+	uniform vec3 uNeighbords[125];
+	uniform float uCr;
+	uniform float uMass;
+	uniform float uMinPress;
+	uniform sampler2D uPT;
+	uniform sampler2D uVT;
+	uniform sampler2D uMPT;
+	uniform sampler2D uMVT;
+	uniform float uX;
+	varying vec2 vV2I;
+	const float divider = 0.0009765625;
+    const vec3 center = vec3(0.5, 0.5, 0.25);
+	const vec3 boxSize = vec3(0.48, 0.48, 0.24);
+	const vec3 c2 = vec3(0.7, 0.2, 0.25);
+	float max2 = uMaxSearchRatio * uMaxSearchRatio;
+    vec3 cD = vec3(uX, 0.1, 0.25);
+	float dist(vec3 p, float r) {
+	    return length(p - cD) - r;
+	}
+    void main(void) {
+		vec3 pressureForce = vec3(0.0);
+		vec3 viscosityForce = vec3(0.0);
+		vec3 internalForces = vec3(0.0);
+		vec4 particleData = texture2D(uPT, vV2I);
+		vec3 particlePosition = particleData.rgb;
+		vec4 readData = texture2D(uVT, vV2I);
+		vec3 velocity = readData.rgb;
+        float density = readData.a;
+        vec3 gridParticlePosition = floor(particlePosition * 128.);
+        float particlePressure = max(uK * (density - 1000.), uMinPress);
+        for(int i = 0; i < 27; i++) {
+            vec3 nGridPosition = gridParticlePosition + uNeighbords[i];
+            vec2 nIndex2D = divider * (nGridPosition.xy + 128. * vec2(mod(nGridPosition.z, 8.), floor(nGridPosition.z * 0.125)) + vec2(0.5));
+            vec4 nParticlePosition = texture2D(uMPT, nIndex2D);
+            float particles = nParticlePosition.a;
+            float invParticles = 1. / max(particles, 1.);
+            nParticlePosition.rgb *= invParticles;
+            vec3 distance = nParticlePosition.rgb - particlePosition;
+            float ratio = length(distance);
+            vec4 nData = texture2D(uMVT, nIndex2D) * invParticles;
+            float invDen = 1. / max(nData.a, .001);
+            float dif = max(uMaxSearchRatio - ratio, 0.);
+            float divider = max(length(distance), 0.0001);
+            pressureForce += (invDen * nParticlePosition.a * (max(uK * (nData.a - 1000.), uMinPress) + particlePressure) * dif * dif) * distance / divider;
+            viscosityForce += (invDen * nParticlePosition.a * dif) * (nData.rgb - velocity);
+        }
+        internalForces = uMass * ((0.5 * uWeightPressureConstant) * pressureForce + (uViscosity * uWeightViscosityConstant) * viscosityForce);
+
+
+        float di = dist(particlePosition, 0.2);
+        vec3 norm = normalize(particlePosition - cD);
+        velocity += (reflect(velocity, norm) - velocity) * step(di, 0.);
+
+
+        vec3 xLocal = particlePosition - center;
+        vec3 contactPointLocal = min(boxSize, max(-boxSize, xLocal));
+        vec3 normal = normalize(sign(contactPointLocal - xLocal));
+
+        vec3 d = abs(particlePosition - center) - boxSize;
+        float distance = min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+
+
+
+        float restitution = distance / max(uDeltaT * length(velocity), 0.001);
+        if(distance > 0.) velocity -= ((1.0 + restitution) * dot(velocity, normal) * step(-length(velocity), 0.)) * normal;
+        vec3 aceleration = 2. * step(di, -.5) * norm + vec3(0.0, -9.81, 0.0) + internalForces / density;
+        vec3 old = velocity;
+        velocity += uDeltaT * aceleration;
+        velocity = 0.5 * (old + velocity);
+		gl_FragColor = vec4(velocity, 0.);
+	}
+</script>
+
+<script id="fs-position" type="x-shader/x-fragment">
+    precision highp float;
+    uniform highp sampler2D uPT;
+    uniform highp sampler2D uVT;
+    uniform float uDeltaT;
+    uniform float uX;
+    varying vec2 vV2I;
+    vec3 cD = vec3(uX, 0.1, 0.25);
+    const vec3 center = vec3(0.5, 0.5, 0.25);
+	const vec3 boxSize = vec3(0.48, 0.48, 0.24);
+	float dist(vec3 p, float r) {
+	    return length(p - cD) - r;
+	}
+    void main(void) {
+        vec3 particlePosition = texture2D(uPT, vV2I).rgb;
+        vec3 vel = texture2D(uVT, vV2I).rgb;
+        float d = dist(particlePosition, 0.2);
+        particlePosition -= 5. * d * normalize(vel) * step(d, 0.);
+        vec3 nPP = particlePosition + uDeltaT * vel;
+
+        vec3 xLocal = nPP - center;
+        vec3 contactPointLocal = min(boxSize, max(-boxSize, xLocal));
+        vec3 contactPoint = contactPointLocal + center;
+        float distance = length(contactPoint - nPP);
+        nPP += (contactPoint - nPP) * step(d, 0.);
+
+        gl_FragColor = vec4(nPP , 1.);
+    }
+</script>
+
+<script id="fs-setTexture" type="x-shader/x-fragment">
+	precision highp sampler2D;
+	precision highp float;
+    uniform sampler2D uDT;
+    varying vec2 vText;
+    void main(void) {
+		gl_FragColor = vec4(texture2D(uDT, vText).rgb, 1.);
+    }
+</script>
+
+<script id="fs-whiteColor" type="x-shader/x-fragment">
+	precision highp float;
+    void main(void) {
+		gl_FragColor = vec4(1.);
+    }
+</script>
+
+<script id="fs-blur2D" type="x-shader/x-fragment">
+    precision highp float;
+	precision highp sampler2D;
+    uniform sampler2D uDT;
+    uniform vec3 uAxis;
+    void main(void) {
+        vec2 position = gl_FragCoord.xy * uAxis.z;
+        vec3 blend = texture2D(uDT, position - uAxis.xy).rgb;
+        blend += 2. * texture2D(uDT, position).rgb;
+        blend += texture2D(uDT, position + uAxis.xy).rgb;
+        blend *= 0.25;
+        gl_FragColor = vec4(blend, 1.);
+    }
+</script>
+
+<script id="fs-blurZ" type="x-shader/x-fragment">
+    precision highp float;
+	precision highp sampler2D;
+    uniform sampler2D uDT;
+    const float k = 0.0009765625;
+    const vec2 jump = vec2(896., -128.);
+    const vec2 axis = vec2(128., 0.);
+    void main(void) {
+        vec2 position = floor(gl_FragCoord.xy);
+        vec2 leftPos = position - axis;
+        vec2 rightPos = position + axis;
+        leftPos += (position + jump - leftPos) * step(leftPos.x, 0.);
+        rightPos += (position - jump - rightPos) * step(-rightPos.x, -1023.);
+        float blend = texture2D(uDT, leftPos * k).r * step(-leftPos.x, 0.) * step(-leftPos.y, 0.);
+        blend += 2. * texture2D(uDT, position * k).r;
+        blend += texture2D(uDT, rightPos * k).r * step(rightPos.y, 1023.) * step(rightPos.x, 1023.);
+        blend *= 0.25;
+        blend -= blend * step(mod(leftPos.x + 2., 128.), 4.);
+        blend -= blend * step(mod(rightPos.y + 8., 128.), 9.);
+        gl_FragColor = vec4(blend, 0., 0., 1.);
+    }
+</script>
+
+<script id="fs-getCorners" type="x-shader/x-fragment">
+    precision highp float;
+	precision highp sampler2D;
+    uniform sampler2D uDT;
+    uniform float uRange;
+    const float k = 0.0078125;
+    vec2 index2D(vec3 pos) {
+		return 0.0009765625 * (pos.xy + 128. * vec2(mod(pos.z, 8.), floor(pos.z * 0.125)) + vec2(0.5));
+    }
+    void main(void) {
+        vec2 position = floor(gl_FragCoord.xy);
+        vec3 pos3D = vec3(mod(position.x, 128.), mod(position.y, 128.), 8. * floor(position.y * k) + floor(position.x * k));
+        float c = 0.125 * (texture2D(uDT, index2D(pos3D + vec3(-1., -1., -1.))).r + texture2D(uDT, index2D(pos3D + vec3(0., -1., -1.))).r + texture2D(uDT, index2D(pos3D + vec3(0., 0., -1.))).r + texture2D(uDT, index2D(pos3D + vec3(-1., 0., -1))).r + texture2D(uDT, index2D(pos3D + vec3(-1., -1., 0.))).r + texture2D(uDT, index2D(pos3D + vec3(0., -1., 0.))).r + texture2D(uDT, index2D(pos3D + vec3(0., 0., 0.))).r + texture2D(uDT, index2D(pos3D + vec3(-1., 0., 0.))).r);
+        gl_FragColor = vec4(c, 0., 0., 1.);
+    }
+</script>
+
+<script id="fs-marchCase" type="x-shader/x-fragment">
+    precision highp float;
+	precision highp sampler2D;
+    uniform sampler2D uDT;
+    uniform float uRange;
+    const float k = 0.0078125;
+    vec2 index2D(vec3 pos) {
+		return 0.0009765625 * (pos.xy + 128. * vec2(mod(pos.z, 8.), floor(pos.z * 0.125)) + vec2(0.5));
+    }
+    void main(void) {
+        vec2 position = floor(gl_FragCoord.xy);
+        vec3 pos3D = vec3(mod(position.x, 128.), mod(position.y, 128.), 8. * floor(position.y * k) + floor(position.x * k));
+        float c = step(texture2D(uDT, index2D(pos3D)).r, uRange) + 2. * step(texture2D(uDT, index2D(pos3D + vec3(1, 0., 0.))).r, uRange) + 4. * step(texture2D(uDT, index2D(pos3D + vec3(1, 1, 0.))).r, uRange) + 8. * step(texture2D(uDT, index2D(pos3D + vec3(0., 1, 0.))).r, uRange) + 16. * step(texture2D(uDT, index2D(pos3D + vec3(0., 0., 1))).r, uRange) + 32. * step(texture2D(uDT, index2D(pos3D + vec3(1, 0., 1))).r, uRange) + 64. * step(texture2D(uDT, index2D(pos3D + vec3(1, 1, 1))).r, uRange) + 128. * step(texture2D(uDT, index2D(pos3D + vec3(0., 1, 1))).r, uRange);
+        c *= step(c, 254.);
+        gl_FragColor = vec4(step(-c, -0.5) * vec3(1.), c);
+    }
+</script>
+
+<script id="fs-pyramid" type="x-shader/x-fragment">
+    precision highp float;
+	precision highp sampler2D;
+    uniform sampler2D uPyT;
+    uniform float uSize;
+    void main(void) {
+        float k = 0.5 * uSize;
+        vec2 position = floor(vec2(gl_FragCoord.x, gl_FragCoord.y)) * uSize;
+        gl_FragColor = vec4(texture2D(uPyT,  position + vec2(0., 0.)).r + texture2D(uPyT,  position + vec2(0., k)).r + texture2D(uPyT,  position + vec2(k, 0.)).r + texture2D(uPyT,  position + vec2(k, k)).r);
+    }
+</script>
+
+<script id="fs-pack" type="x-shader/x-fragment">
+    precision highp float;
+	precision highp sampler2D;
+    uniform sampler2D uPyT;
+    varying vec2 vTextureUV;
+    void main(void) {
+         vec4 enc = fract(vec4(1., 255., 65025., 160581375.) * texture2D(uPyT, vec2(0.)).r * 9.53674316e-7);
+         enc -= enc.yzww * vec4(vec3(0.00392157), 0.);
+         gl_FragColor = enc;
+    }
+</script>
+
+<script id="fs-parsePyramid" type="x-shader/x-fragment">
+    precision highp float;
+    precision highp sampler2D;
+    uniform highp sampler2D uLev0;
+    uniform highp sampler2D uLev1;
+    uniform highp sampler2D uLev2;
+    uniform highp sampler2D uLev3;
+    uniform highp sampler2D uLev4;
+    uniform highp sampler2D uLev5;
+    uniform highp sampler2D uLev6;
+    uniform highp sampler2D uLev7;
+    uniform highp sampler2D uLev8;
+    uniform highp sampler2D uLev9;
+    varying float vVI;
+    float kSize[12];
+    void main(void) {
+        vec2 position = vec2(0.);
+        float start = 0.;
+        float end = 0.;
+        kSize [0] = 0.5;
+        kSize [1] = 0.25;
+        kSize [2] = 0.125;
+        kSize [3] = 0.0625;
+        kSize [4] = 0.03125;
+        kSize [5] = 0.015625;
+        kSize [6] = 0.0078125;
+        kSize [7] = 0.00390625;
+        kSize [8] = 0.001953125;
+        kSize [9] = 0.0009765625;
+        float aVI = vVI;
+        float k = kSize[0];
+        end = start + texture2D(uLev0, position).r;
+        vec2 pos1 = position;
+        float start1 = start;
+        float end1 = end;
+        float eval1 = step(-aVI, - start1) * step(aVI, end1 - 0.5);
+        vec2 pos2 = position + vec2(k, 0.);
+        float start2 = end1;
+        float end2 = end1 + texture2D(uLev0, pos2).r;
+        float eval2 = step(-aVI, - start2) * step(aVI, end2 - 0.5);
+        vec2 pos3 = position + vec2(0., k);
+        float start3 = end2;
+        float end3 = end2 + texture2D(uLev0, pos3).r;
+        float eval3 = step(-aVI, - start3) * step(aVI, end3 - 0.5);
+        vec2 pos4 = position + vec2(k, k);
+        float start4 = end3;
+        float eval4 = 1. - eval1 - eval2 - eval3;
+        position = eval1 * pos1 + eval2 * pos2 + eval3 * pos3 + eval4 * pos4;
+        start = eval1 * start1 + eval2 * start2  + eval3 * start3 + eval4 * start4;
+        k = kSize[1];
+        end = start + texture2D(uLev1, position).r;
+        pos1 = position;
+        start1 = start;
+        end1 = end;
+        eval1 = step(-aVI, - start1) * step(aVI, end1 - 0.5);
+        pos2 = position + vec2(k, 0.);
+        start2 = end1;
+        end2 = end1 + texture2D(uLev1, pos2).r;
+        eval2 = step(-aVI, - start2) * step(aVI, end2 - 0.5);
+        pos3 = position + vec2(0., k);
+        start3 = end2;
+        end3 = end2 + texture2D(uLev1, pos3).r;
+        eval3 = step(-aVI, - start3) * step(aVI, end3 - 0.5);
+        pos4 = position + vec2(k, k);
+        start4 = end3;
+        eval4 = 1. - eval1 - eval2 - eval3;
+        position = eval1 * pos1 + eval2 * pos2 + eval3 * pos3 + eval4 * pos4;
+        start = eval1 * start1 + eval2 * start2  + eval3 * start3 + eval4 * start4;
+        k = kSize[2];
+        end = start + texture2D(uLev2, position).r;
+        pos1 = position;
+        start1 = start;
+        end1 = end;
+        eval1 = step(-aVI, - start1) * step(aVI, end1 - 0.5);
+        pos2 = position + vec2(k, 0.);
+        start2 = end1;
+        end2 = end1 + texture2D(uLev2, pos2).r;
+        eval2 = step(-aVI, - start2) * step(aVI, end2 - 0.5);
+        pos3 = position + vec2(0., k);
+        start3 = end2;
+        end3 = end2 + texture2D(uLev2, pos3).r;
+        eval3 = step(-aVI, - start3) * step(aVI, end3 - 0.5);
+        pos4 = position + vec2(k, k);
+        start4 = end3;
+        eval4 = 1. - eval1 - eval2 - eval3;
+        position = eval1 * pos1 + eval2 * pos2 + eval3 * pos3 + eval4 * pos4;
+        start = eval1 * start1 + eval2 * start2  + eval3 * start3 + eval4 * start4;
+        k = kSize[3];
+        end = start + texture2D(uLev3, position).r;
+        pos1 = position;
+        start1 = start;
+        end1 = end;
+        eval1 = step(-aVI, - start1) * step(aVI, end1 - 0.5);
+        pos2 = position + vec2(k, 0.);
+        start2 = end1;
+        end2 = end1 + texture2D(uLev3, pos2).r;
+        eval2 = step(-aVI, - start2) * step(aVI, end2 - 0.5);
+        pos3 = position + vec2(0., k);
+        start3 = end2;
+        end3 = end2 + texture2D(uLev3, pos3).r;
+        eval3 = step(-aVI, - start3) * step(aVI, end3 - 0.5);
+        pos4 = position + vec2(k, k);
+        start4 = end3;
+        eval4 = 1. - eval1 - eval2 - eval3;
+        position = eval1 * pos1 + eval2 * pos2 + eval3 * pos3 + eval4 * pos4;
+        start = eval1 * start1 + eval2 * start2  + eval3 * start3 + eval4 * start4;
+        k = kSize[4];
+        end = start + texture2D(uLev4, position).r;
+        pos1 = position;
+        start1 = start;
+        end1 = end;
+        eval1 = step(-aVI, - start1) * step(aVI, end1 - 0.5);
+        pos2 = position + vec2(k, 0.);
+        start2 = end1;
+        end2 = end1 + texture2D(uLev4, pos2).r;
+        eval2 = step(-aVI, - start2) * step(aVI, end2 - 0.5);
+        pos3 = position + vec2(0., k);
+        start3 = end2;
+        end3 = end2 + texture2D(uLev4, pos3).r;
+        eval3 = step(-aVI, - start3) * step(aVI, end3 - 0.5);
+        pos4 = position + vec2(k, k);
+        start4 = end3;
+        eval4 = 1. - eval1 - eval2 - eval3;
+        position = eval1 * pos1 + eval2 * pos2 + eval3 * pos3 + eval4 * pos4;
+        start = eval1 * start1 + eval2 * start2  + eval3 * start3 + eval4 * start4;
+        k = kSize[5];
+        end = start + texture2D(uLev5, position).r;
+        pos1 = position;
+        start1 = start;
+        end1 = end;
+        eval1 = step(-aVI, - start1) * step(aVI, end1 - 0.5);
+        pos2 = position + vec2(k, 0.);
+        start2 = end1;
+        end2 = end1 + texture2D(uLev5, pos2).r;
+        eval2 = step(-aVI, - start2) * step(aVI, end2 - 0.5);
+        pos3 = position + vec2(0., k);
+        start3 = end2;
+        end3 = end2 + texture2D(uLev5, pos3).r;
+        eval3 = step(-aVI, - start3) * step(aVI, end3 - 0.5);
+        pos4 = position + vec2(k, k);
+        start4 = end3;
+        eval4 = 1. - eval1 - eval2 - eval3;
+        position = eval1 * pos1 + eval2 * pos2 + eval3 * pos3 + eval4 * pos4;
+        start = eval1 * start1 + eval2 * start2  + eval3 * start3 + eval4 * start4;
+        k = kSize[6];
+        end = start + texture2D(uLev6, position).r;
+        pos1 = position;
+        start1 = start;
+        end1 = end;
+        eval1 = step(-aVI, - start1) * step(aVI, end1 - 0.5);
+        pos2 = position + vec2(k, 0.);
+        start2 = end1;
+        end2 = end1 + texture2D(uLev6, pos2).r;
+        eval2 = step(-aVI, - start2) * step(aVI, end2 - 0.5);
+        pos3 = position + vec2(0., k);
+        start3 = end2;
+        end3 = end2 + texture2D(uLev6, pos3).r;
+        eval3 = step(-aVI, - start3) * step(aVI, end3 - 0.5);
+        pos4 = position + vec2(k, k);
+        start4 = end3;
+        eval4 = 1. - eval1 - eval2 - eval3;
+        position = eval1 * pos1 + eval2 * pos2 + eval3 * pos3 + eval4 * pos4;
+        start = eval1 * start1 + eval2 * start2  + eval3 * start3 + eval4 * start4;
+        k = kSize[7];
+        end = start + texture2D(uLev7, position).r;
+        pos1 = position;
+        start1 = start;
+        end1 = end;
+        eval1 = step(-aVI, - start1) * step(aVI, end1 - 0.5);
+        pos2 = position + vec2(k, 0.);
+        start2 = end1;
+        end2 = end1 + texture2D(uLev7, pos2).r;
+        eval2 = step(-aVI, - start2) * step(aVI, end2 - 0.5);
+        pos3 = position + vec2(0., k);
+        start3 = end2;
+        end3 = end2 + texture2D(uLev7, pos3).r;
+        eval3 = step(-aVI, - start3) * step(aVI, end3 - 0.5);
+        pos4 = position + vec2(k, k);
+        start4 = end3;
+        eval4 = 1. - eval1 - eval2 - eval3;
+        position = eval1 * pos1 + eval2 * pos2 + eval3 * pos3 + eval4 * pos4;
+        start = eval1 * start1 + eval2 * start2  + eval3 * start3 + eval4 * start4;
+        k = kSize[8];
+        end = start + texture2D(uLev8, position).r;
+        pos1 = position;
+        start1 = start;
+        end1 = end;
+        eval1 = step(-aVI, - start1) * step(aVI, end1 - 0.5);
+        pos2 = position + vec2(k, 0.);
+        start2 = end1;
+        end2 = end1 + texture2D(uLev8, pos2).r;
+        eval2 = step(-aVI, - start2) * step(aVI, end2 - 0.5);
+        pos3 = position + vec2(0., k);
+        start3 = end2;
+        end3 = end2 + texture2D(uLev8, pos3).r;
+        eval3 = step(-aVI, - start3) * step(aVI, end3 - 0.5);
+        pos4 = position + vec2(k, k);
+        start4 = end3;
+        eval4 = 1. - eval1 - eval2 - eval3;
+        position = eval1 * pos1 + eval2 * pos2 + eval3 * pos3 + eval4 * pos4;
+        start = eval1 * start1 + eval2 * start2  + eval3 * start3 + eval4 * start4;
+        k = kSize[9];
+        end = start + texture2D(uLev9, position).r;
+        pos1 = position;
+        start1 = start;
+        end1 = end;
+        eval1 = step(-aVI, - start1) * step(aVI, end1 - 0.5);
+        pos2 = position + vec2(k, 0.);
+        start2 = end1;
+        end2 = end1 + texture2D(uLev9, pos2).r;
+        eval2 = step(-aVI, - start2) * step(aVI, end2 - 0.5);
+        pos3 = position + vec2(0., k);
+        start3 = end2;
+        end3 = end2 + texture2D(uLev9, pos3).r;
+        eval3 = step(-aVI, - start3) * step(aVI, end3 - 0.5);
+        pos4 = position + vec2(k, k);
+        start4 = end3;
+        eval4 = 1. - eval1 - eval2 - eval3;
+        position = eval1 * pos1 + eval2 * pos2 + eval3 * pos3 + eval4 * pos4;
+        start = eval1 * start1 + eval2 * start2  + eval3 * start3 + eval4 * start4;
+        vec2 index = position * 1024.;
+        float div0 = 0.0078125;
+        gl_FragColor = vec4(div0 * vec3(mod(index.x, 128.), mod(index.y, 128.), 8. * floor(index.y * div0) + floor(index.x * div0)), texture2D(uLev9, position).a);
+    }
+</script>
+
+<script id="fs-triangleCreator" type="x-shader/x-fragment">
+    precision highp float;
+    precision highp sampler2D;
+    uniform sampler2D uPot;
+    uniform sampler2D marchTex;
+    uniform sampler2D uTI;
+    uniform float uRange;
+    uniform float uLimit;
+    varying float vVI;
+    vec2 index2D(vec3 pos) {
+		return 0.0009765625 * (pos.xy + 128. * vec2(mod(pos.z, 8.), floor(pos.z * 0.125)) + vec2(0.5));
+    }
+    void main(void) {
+        float div1 = 0.0009765625;
+        float marchVI = floor(vVI * 0.08333333333);
+        float k = 0.0078125;
+        vec3 color = vec3(0.);
+        vec4 data = texture2D(marchTex, vec2(mod(marchVI, 1024.) + 0.5, 0.5 + floor(marchVI * div1)) * div1);
+        vec3 corner0 = data.rgb;
+        vec3 corner1 = corner0 + vec3(k, 0., 0.);
+        vec3 corner2 = corner0 + vec3(k, k, 0.);
+        vec3 corner3 = corner0 + vec3(0., k, 0.);
+        vec3 corner4 = corner0 + vec3(0., 0., k);
+        vec3 corner5 = corner0 + vec3(k, 0., k);
+        vec3 corner6 = corner0 + vec3(k, k, k);
+        vec3 corner7 = corner0 + vec3(0., k, k);
+        float vIx = 12. * data.a + mod(vVI, 12.);
+        div1 = 0.015625;
+        vIx = texture2D(uTI, div1 * vec2(mod(vIx, 64.) + 0.5, floor(vIx * div1) + 0.5)).r;
+        vec3 b0 = corner0 * step(vIx, 0.5) * step(-vIx, 0.5) + corner1 * step(vIx, 1.5) * step(-vIx, -0.5) + corner2 * step(vIx, 2.5) * step(-vIx, -1.5) + corner3 * step(vIx, 3.5) * step(-vIx, -2.5);
+        b0 += corner4 * step(vIx, 4.5) * step(-vIx, -3.5) + corner5 * step(vIx, 5.5) * step(-vIx, -4.5) + corner6 * step(vIx, 6.5) * step(-vIx, -5.5) + corner7 * step(vIx, 7.5) * step(-vIx, -6.5);
+        b0 += corner0 * step(vIx, 8.5) * step(-vIx, -7.5) + corner1 * step(vIx, 9.5) * step(-vIx, -8.5) + corner2 * step(vIx, 10.5) * step(-vIx, -9.5) + corner3 * step(vIx, 11.5) * step(-vIx, -10.5);
+        vec3 b1 = corner1 * step(vIx, 0.5) * step(-vIx, 0.5) + corner2 * step(vIx, 1.5) * step(-vIx, -0.5) + corner3 * step(vIx, 2.5) * step(-vIx, -1.5) + corner0 * step(vIx, 3.5) * step(-vIx, -2.5);
+        b1 += corner5 * step(vIx, 4.5) * step(-vIx, -3.5) + corner6 * step(vIx, 5.5) * step(-vIx, -4.5) + corner7 * step(vIx, 6.5) * step(-vIx, -5.5) + corner4 * step(vIx, 7.5) * step(-vIx, -6.5);
+        b1 += corner4 * step(vIx, 8.5) * step(-vIx, -7.5) + corner5 * step(vIx, 9.5) * step(-vIx, -8.5) + corner6 * step(vIx, 10.5) * step(-vIx, -9.5) + corner7 * step(vIx, 11.5) * step(-vIx, -10.5);
+        float m0 = texture2D(uPot, index2D(128. * b0)).r;
+        float m1 = texture2D(uPot, index2D(128. * b1)).r;
+        color = mix(b0, b1, (uRange - m0) / (m1 - m0));
+        color += (b0 - color) * step(abs(uRange - m0), uLimit);
+        color += (b1 - color) * step(abs(uRange - m1), uLimit);
+        color += (b0 - color) * step(abs(m0 - m1), uLimit);
+        vec2 deltaX = index2D(128. * (b0 + vec3(k, 0., 0.)));
+        vec2 deltaY = index2D(128. * (b0 + vec3(0., k, 0.)));
+        vec2 deltaZ = index2D(128. * (b0 + vec3(0., 0., k)));
+        vec3 normal = normalize(vec3(m0 - texture2D(uPot, deltaX).r, m0 - texture2D(uPot, deltaY).r, m0 - texture2D(uPot, deltaZ).r));
+        deltaX = index2D(128. * (b1 + vec3(k, 0., 0.)));
+        deltaY = index2D(128. * (b1 + vec3(0., k, 0.)));
+        deltaZ = index2D(128. * (b1 + vec3(0., 0., k)));
+        vec3 normal1 = normalize(vec3(m1 - texture2D(uPot, deltaX).r, m1 - texture2D(uPot, deltaY).r, m1 - texture2D(uPot, deltaZ).r));
+        normal = (m0 * normal + m1 * normal1) / (m0 + m1);
+        color = 10. * floor(1000. * normal) + color;
+        gl_FragColor = vec4(color, 1.);
+    }
+</script>
+
+<script id="fs-render" type="x-shader/x-fragment">
+	precision highp sampler2D;
+	precision highp float;
+	uniform vec3 uEye;
+	uniform samplerCube uCube;
+	varying vec3 vNor;
+	varying vec2 vIndex;
+	varying vec4 vColor;
+    void main(void) {
+        vec3 light = normalize(vec3(0., 1., 0.));
+        vec3 eye = normalize(uEye);
+        vec3 ref = reflect(light, vNor);
+        vec3 c = vec3(1.);
+        vec3 amb = textureCube(uCube, vNor).rgb;
+        float ang = pow(max(dot(eye, ref), 0.), 1.);
+        vec3 phong = 0.1 * c + 0.2 * c * max(dot(light, vNor), 0.) + 200. * vec3(1.) * max(pow(dot(reflect(light, -vNor), eye), 60.), 0.);
+        phong = mix(phong, 0. * phong, ang);
+		gl_FragColor = vec4(phong, vColor.a);
+    }
+</script>
+
+<script id="fs-BrigtnessContrast" type="x-shader/x-fragment">
+	precision highp sampler2D;
+	precision highp float;
+    uniform sampler2D uDT;
+    uniform float uB;
+    uniform float uC;
+    varying vec2 vText;
+    void main(void) {
+        vec3 color = texture2D(uDT, vText).rgb;
+        color = pow(clamp(color, 0.0, 1.0), vec3(0.45));
+        color = mix(vec3(0.5), color, uC);
+        color = mix(vec3(0.), color, uB);
+		gl_FragColor = vec4(color, 1.);
+    }
+</script>
+
+<script id="fs-renderSphere" type="x-shader/x-fragment">
+	precision highp sampler2D;
+	precision highp float;
+	uniform vec3 uEye;
+	varying vec3 vNor;
+	varying vec4 vColor;
+    void main(void) {
+        vec3 light = normalize(vec3(0., 1., 0.));
+        vec3 eye = normalize(uEye);
+        vec3 ref = reflect(light, vNor);
+        vec3 c = vec3(1., 0., 0.);
+        vec3 phong = 0.1 * c + 0.2 * c * max(dot(light, vNor), 0.);
+		gl_FragColor = vec4(phong, vColor.a);
+    }
+</script>
+
+<script id="fs-particleSizeZ" type="x-shader/x-fragment">
+    precision highp float;
+	precision highp sampler2D;
+    uniform sampler2D uDT;
+    const float k = 0.0009765625;
+    const vec2 jump = vec2(896., -128.);
+    const vec2 axis = vec2(128., 0.);
+    void main(void) {
+        vec2 position = floor(gl_FragCoord.xy);
+        vec2 leftPos = position - axis;
+        //vec2 left2Pis = position - 2. * axis;
+        leftPos += (position + jump - leftPos) * step(leftPos.x, 0.);
+        //left2Pis += (position + jump - left2Pis) * step(left2Pis.x, 0.);
+        float blend = texture2D(uDT, position * k).r;
+        blend += texture2D(uDT, leftPos * k).r * step(-leftPos.x, 0.) * step(-leftPos.y, 0.);
+        //blend += texture2D(uDT, left2Pis * k).r * step(-left2Pis.x, 0.) * step(-left2Pis.y, 0.);
+        gl_FragColor = vec4(step(-blend, -0.1), 0., 0., 1.);
+    }
+</script>
+
+
+<style>
+    body{
+        margin-top:0px;
+        margin-left:0px;
+        margin-right:0px;
+        margin-bottom:0px;
+        overflow: hidden;
+        font-family: tahoma;
+        font-size:11px;
+        margin: 0px;
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+    }
+    #container{
+        position : absolute;
+        cursor: default;
+    }
+    #text {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        position: absolute;
+        right: 25px;
+        top: 13px;
+        color: #333;
+    }
+    #bgWhite {
+        height: 100%;
+        background-color: #eee;
+        position : absolute;
+        width: 330px;
+        right: 0px;
+    }
+    #disclaimer {
+        font-size:10px;
+    }
+</style>
+</head>
+<body  onLoad="setup();">
+<div id="container"><canvas id="canvas3D"></canvas></div>
+<div id="bgWhite">
+    <div id="text">
+        <p><b>WEBGL GPU MARCHING CUBES | SPH SIMULATION</b></br>
+        Clic and drag to rotate the view</br></br></br></br>
+        The Controls options are explained below:
+        </p>
+        <li><b>totalParticles:</b> changes the number of particles</br>
+        used in the SPH. Affects fps, so use low values. (*)</li>
+        <li><b>mass multiplier:</b> change particle´ s mass to</br>
+            increase all the Forces that affect it.</li>
+        <li><b>k constant:</b> change the way how pressure</br>
+            forces work in all the particles.</li>
+        <li><b>viscosity term:</b> change the way how viscosity</br>
+            forces work in all the particles.</li>
+        <li><b>time integrator:</b> change the speed of the</br>
+            simulation, high times causes divergences. (**)</li>
+        <li><b>particle Size:</b> size of the particle to be</br>
+            painted in the 3D texture for the MC.</li>
+        <li><b>spread:</b> makes a 3d blur in the 3d texture</br>
+            for the MC. Affects fps, use as low as possible. (*)</li>
+        <li><b>range:</b> value used to obtain the isosurface,</br>
+            high values filters noise particles.</li>
+        <li><b>opacity:</b> changes the final alpha value of the</br>
+            mesh for blending (transparency) effects.</li>
+        <li><b>brigtness:</b> mix between the final color and</br>
+            full black.</li>
+        <li><b>brigtness:</b> mix between the final color and</br>
+            gray color (0.5, 0.5, 0.5).</li>
+        <li><b>finalBlur:</b> 2D blur used to smooth the final</br>
+            result rendered in the screen. (*)</li>
+        <li><b>spread Z:</b> 3d variant of the particle size</br>
+            it makes a hard particle spread in the Z axis.</li>
+        <li><b>show simulation:</b> renders the simulation as</br>
+            particles, the particle size affects this.</li>
+        <p id="disclaimer">* The simulation runs around 30 fps in desktops and 20 fps</br>
+            in laptops, if it goes too slow in your browser lower the total</br>
+            particles, the spread and the final blur values in the menu.</br>
+            This would also require to activate the spreadZ flag, and </br>
+            raise the range value to clear the floating noise bubbles.</br></br>
+            ** High time integrator values might produce some divergences</br>
+            in the simulation when the sphere is moved by the user. </br>
+            Lower the time value to run slower time steps to avoid it.</br>
+            Framerate also might be raised disabling the interactive mode.</br></br>
+            *** This simulation might not work in mobile devices. :(
+        </p>
+    </div>
+</div>
+</html>
