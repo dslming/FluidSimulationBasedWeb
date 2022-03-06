@@ -1,0 +1,72 @@
+body{
+  margin: 0;
+  padding: 0;
+  font-size: 15px;
+}
+
+#container{
+  position:relative;
+  margin: 0 auto;
+  width: 600px;
+  height: 600px;
+}
+
+#world{
+  position:relative;
+  height: 100%;
+  width: 100%;
+  border: 0px blue solid;
+  margin-top: 20px;
+
+  #vectorField{
+    display:block;
+    height: 100%;
+    width: 100%;
+    border: 1px solid black;
+  }
+
+}
+
+.circle{
+  position: absolute;
+  background-color: yellow;
+  top: 0px;
+}
+
+#leftColumn{
+  position: absolute;
+  top: 0px;
+  padding: 20px;
+
+  .param_row{
+    padding: 10px;
+  }
+
+  .rangeValue{
+    display:inline-block;
+    position: relative;
+    width: 25px;
+    border: 1px dashed black;
+    padding: 4px;
+    text-align: center;
+  }
+
+  input[type="range"]{
+    position: relative;
+    cursor: pointer;
+    top: 4px;
+  }
+
+  input[type="button"]{
+    border: 1px solid #777777;
+    color: black;
+    font-size: 15px;
+    width: 50px;
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  input[type="checkbox"]{
+    cursor: pointer;
+  }
+}

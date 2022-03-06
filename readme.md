@@ -45,5 +45,5 @@
 
 ### Moving Particle Simulation / (Moving Particle Semi-Implicit)
 
-- PIC/FLIP
+- PIC/FLIP(Fluid-Implicit Particle)
 - APIC/AFLIP
