@@ -38,12 +38,3 @@
 #### SPH
 
 [sph 2d](https://p.brm.sk/fluid/)
-
-### Smoothed Particle Hydrodynamics
-
-- Position Based Fluids webgl
-
-### Moving Particle Simulation / (Moving Particle Semi-Implicit)
-
-- PIC/FLIP(Fluid-Implicit Particle)
-- APIC/AFLIP

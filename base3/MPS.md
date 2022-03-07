@@ -22,3 +22,7 @@ PIC/FLIP
 #### Affine Particle-In-Cell (APIC)
 
 #### Marker-and-Cell Method (MAC)
+
+http://www.thevisualroom.com/marker_and_cell_method.html
+Projection method (fluid dynamics)
+http://plaza.ufl.edu/ebrackear/
