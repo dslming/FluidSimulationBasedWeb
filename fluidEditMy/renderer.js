@@ -320,6 +320,18 @@ export class Renderer {
     wgl.drawElementsInstancedANGLE(sphereDrawState, wgl.TRIANGLES, this.sphereGeometry.indices.length, wgl.UNSIGNED_SHORT, 0, this.particlesWidth * this.particlesHeight);
 
 
+    // // 渲染到屏幕
+    // wgl.clear(
+    //   wgl.createClearState().bindFramebuffer(null).clearColor(0, 0, 0, 0),
+    //   wgl.COLOR_BUFFER_BIT | wgl.DEPTH_BUFFER_BIT);
+    // var fxaaDrawState = wgl.createDrawState()
+    //   .bindFramebuffer(null)
+    //   .viewport(0, 0, this.canvas.width, this.canvas.height)
+    //   .useProgram(this.fxaaProgram)
+    //   .vertexAttribPointer(this.quadVertexBuffer, 0, 2, wgl.FLOAT, wgl.FALSE, 0, 0)
+    //   .uniformTexture('u_input', 0, wgl.TEXTURE_2D, this.renderingTexture)
+    //   .uniform2f('u_resolution', this.canvas.width, this.canvas.height);
+    // wgl.drawArrays(fxaaDrawState, wgl.TRIANGLE_STRIP, 0, 4);
     // return;
     ///////////////////////////////////////////////////
     // draw occlusion

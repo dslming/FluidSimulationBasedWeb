@@ -22,6 +22,7 @@ void main () {
 
 
     //compute gradient of pressure
+    // 计算压力梯度
     vec3 gradient = vec3(right - left, top - bottom, front - back) / 1.0;
 
     vec3 currentVelocity = texture2D(u_velocityTexture, v_coordinates).rgb;

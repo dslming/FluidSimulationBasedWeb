@@ -5,9 +5,10 @@ import { Camera } from './camera.js'
 import { BoxEditor } from './boxeditor.js'
 import { SimulatorRenderer } from './simulatorrenderer.js'
 import { Slider } from './slider.js'
+import Stats from "./lib/stats.module.js";
 
 var FOV = Math.PI / 3;
-
+var stats = new Stats();
 var State = {
   EDITING: 0,
   SIMULATING: 1
@@ -23,7 +24,8 @@ var PARTICLES_PER_CELL = 10;
 
 export class FluidParticles {
   constructor() {
-
+    const container = document.body;
+    container.appendChild(stats.dom);
     var canvas = this.canvas = document.getElementById('canvas');
     var wgl = this.wgl = new WrappedGL(canvas);
 
@@ -226,6 +228,7 @@ export class FluidParticles {
 
   //the UI elements are all created in the constructor, this just updates the DOM elements
   //should be called every time state changes
+  // UI 元素都是在构造函数中创建的，这只是更新 DOM 元素, 应该在每次状态改变时调用
   redrawUI() {
 
     var simulatingElements = document.querySelectorAll('.simulating-ui');
@@ -377,6 +380,7 @@ export class FluidParticles {
     if (this.state === State.EDITING) {
       this.boxEditor.draw();
     } else if (this.state === State.SIMULATING) {
+      stats.update();
       this.simulatorRenderer.update(this.timeStep);
     }
   }

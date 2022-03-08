@@ -11,7 +11,9 @@ uniform vec3 u_gridResolution;
 
 varying float v_zIndex;
 
-uniform int u_accumulate; //when this is 0, we accumulate (xWeight, yWeight, 0, centerWeight), when 1 we accumulate (xWeight * velocity.x, yWeight * velocity.y, 0, 0)
+// when this is 0, we accumulate (xWeight, yWeight, 0, centerWeight)
+// when 1 we accumulate (xWeight * velocity.x, yWeight * velocity.y, 0, 0)
+uniform int u_accumulate;
 
 float h (float r) {
     if (r >= 0.0 && r <= 1.0) {
@@ -30,7 +32,8 @@ float k (vec3 v) {
 void main () {
     vec3 cellIndex = floor(get3DFragCoord(u_gridResolution + 1.0));
 
-    if (cellIndex.z == v_zIndex) { //make sure we're in the right slice to prevent bleeding
+    //make sure we're in the right slice to prevent bleeding
+    if (cellIndex.z == v_zIndex) {
         //staggered grid position and therefor weight is different for x, y, z and scalar values
         vec3 xPosition = vec3(cellIndex.x, cellIndex.y + 0.5, cellIndex.z + 0.5);
         float xWeight = k(v_position - xPosition);

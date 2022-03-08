@@ -513,6 +513,7 @@ class WrappedGL {
     return this.gl.createFramebuffer();
   }
 
+  // 为帧缓冲区对象指定一张纹理
   framebufferTexture2D(framebuffer, target, attachment, textarget, texture, level) {
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, framebuffer);
     this.changedParameters['framebuffer'] = framebuffer;
@@ -522,6 +523,7 @@ class WrappedGL {
     return this;
   }
 
+  // 为帧缓冲区绑定深度
   framebufferRenderbuffer(framebuffer, target, attachment, renderbuffertarget, renderbuffer) {
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, framebuffer);
     this.changedParameters['framebuffer'] = framebuffer;
@@ -723,7 +725,8 @@ class WrappedGL {
             programs[name] = program;
 
             loadedSoFar++;
-            if (loadedSoFar === programCount) { //if we've loaded all the programs
+            //if we've loaded all the programs
+            if (loadedSoFar === programCount) {
               successCallback(programs);
             }
 

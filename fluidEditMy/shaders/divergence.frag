@@ -1,3 +1,4 @@
+// 散度
 precision highp float;
 
 varying vec2 v_coordinates;

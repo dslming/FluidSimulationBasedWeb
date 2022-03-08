@@ -305,6 +305,7 @@ export class Simulator {
 
     //////////////////////////////////////////////////////
     //transfer particle velocities to grid
+    // 将粒子速度传输到网格
 
     //we transfer particle velocities to the grid in two steps
     //in the first step, we accumulate weight * velocity into tempVelocityTexture and then weight into weightTexture
@@ -327,7 +328,6 @@ export class Simulator {
       .enable(wgl.BLEND)
       .blendEquation(wgl.FUNC_ADD)
       .blendFuncSeparate(wgl.ONE, wgl.ONE, wgl.ONE, wgl.ONE);
-
 
     //accumulate weight
     wgl.framebufferTexture2D(this.simulationFramebuffer, wgl.FRAMEBUFFER, wgl.COLOR_ATTACHMENT0, wgl.TEXTURE_2D, this.weightTexture, 0);
@@ -376,7 +376,6 @@ export class Simulator {
 
     wgl.drawArrays(normalizeDrawState, wgl.TRIANGLE_STRIP, 0, 4);
 
-
     //////////////////////////////////////////////////////
     // mark cells with fluid
 
@@ -397,7 +396,6 @@ export class Simulator {
       .uniformTexture('u_positionTexture', 0, wgl.TEXTURE_2D, this.particlePositionTexture);
 
     wgl.drawArrays(markDrawState, wgl.POINTS, 0, this.particlesWidth * this.particlesHeight);
-
     ////////////////////////////////////////////////////
     // save our original velocity grid
 
@@ -545,6 +543,7 @@ export class Simulator {
 
     swap(this, 'velocityTexture', 'tempVelocityTexture');
 
+
     /////////////////////////////////////////////////////////////
     // transfer velocities back to particles
 
@@ -572,6 +571,7 @@ export class Simulator {
 
     ///////////////////////////////////////////////
     // advect particle positions with velocity grid using RK2
+    // 使用 RK2 以速度网格平流粒子位置
 
 
     wgl.framebufferTexture2D(this.simulationFramebuffer, wgl.FRAMEBUFFER, wgl.COLOR_ATTACHMENT0, wgl.TEXTURE_2D, this.particlePositionTextureTemp, 0);

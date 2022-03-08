@@ -1,4 +1,6 @@
 //advects particle positions with second order runge kutta
+// 用二阶runge kutta对粒子位置进行传播
+// Runge–Kutta methods
 
 varying vec2 v_coordinates;
 
