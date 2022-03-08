@@ -1,4 +1,8 @@
-class SimulatorRenderer {
+import { Utilities } from './utilities.js'
+import { Renderer } from './renderer.js'
+import { Simulator } from './simulator.js'
+
+export class SimulatorRenderer {
   constructor(canvas, wgl, projectionMatrix, camera, gridDimensions, onLoaded) {
     this.canvas = canvas;
     this.wgl = wgl;

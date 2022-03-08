@@ -1,3 +1,5 @@
+import { Utilities } from './utilities.js'
+
 var SHADOW_MAP_WIDTH = 256;
 var SHADOW_MAP_HEIGHT = 256;
 
@@ -142,7 +144,7 @@ function generateSphereGeometry(iterations) {
   }
 }
 
-class Renderer {
+export class Renderer {
   //you need to call reset() before drawing
   constructor(canvas, wgl, gridDimensions, onLoaded) {
 
@@ -291,7 +293,6 @@ class Renderer {
 
     var sphereDrawState = wgl.createDrawState()
       .bindFramebuffer(this.renderingFramebuffer)
-      // .bindFramebuffer(null)
       .viewport(0, 0, this.canvas.width, this.canvas.height)
 
       .enable(wgl.DEPTH_TEST)

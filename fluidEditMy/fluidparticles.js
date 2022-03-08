@@ -1,5 +1,10 @@
-'use strict'
 // 入口
+import { WrappedGL } from './wrappedGL/wrappedgl.js'
+import { Utilities } from './utilities.js'
+import { Camera } from './camera.js'
+import { BoxEditor } from './boxeditor.js'
+import { SimulatorRenderer } from './simulatorrenderer.js'
+import { Slider } from './slider.js'
 
 var FOV = Math.PI / 3;
 
@@ -16,7 +21,7 @@ var PARTICLES_PER_CELL = 10;
 
 
 
-class FluidParticles {
+export class FluidParticles {
   constructor() {
 
     var canvas = this.canvas = document.getElementById('canvas');

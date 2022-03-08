@@ -4,7 +4,7 @@ function swap(object, a, b) {
   object[b] = temp;
 }
 
-class Simulator {
+export class Simulator {
 
   //simulation grid dimensions and resolution
   //all particles are in the world position space ([0, 0, 0], [GRID_WIDTH, GRID_HEIGHT, GRID_DEPTH])
