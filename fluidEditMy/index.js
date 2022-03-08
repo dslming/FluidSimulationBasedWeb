@@ -25,6 +25,7 @@ WrappedGL.checkWebGLSupportWithExtensions(
     //we have webgl
     document.getElementById("placeholder").outerHTML = document.getElementById("main").innerHTML;
     var fluidBox = new FluidParticles();
+    window.fluidBox = fluidBox;
   },
   function(hasWebGL, unsupportedExtensions) {
     document.getElementById("placeholder").outerHTML = document.getElementById("no-support").innerHTML;

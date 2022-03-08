@@ -278,6 +278,7 @@ export class FluidParticles {
 
 
   //compute the number of particles for the current boxes and grid density
+  // 计算当前框的粒子数和网格密度
   getParticleCount() {
     var boxEditor = this.boxEditor;
 

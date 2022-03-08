@@ -215,6 +215,7 @@ export class Simulator {
     var particleCount = this.particlesWidth * this.particlesHeight;
 
     //fill particle vertex buffer containing the relevant texture coordinates
+    // 填充包含相关纹理坐标的粒子顶点缓冲区
     var particleTextureCoordinates = new Float32Array(this.particlesWidth * this.particlesHeight * 2);
     for (var y = 0; y < this.particlesHeight; ++y) {
       for (var x = 0; x < this.particlesWidth; ++x) {
