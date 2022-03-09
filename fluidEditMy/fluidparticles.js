@@ -7,18 +7,19 @@ import { SimulatorRenderer } from './simulatorrenderer.js'
 import { Slider } from './slider.js'
 import Stats from "./lib/stats.module.js";
 
-var FOV = Math.PI / 3;
-var stats = new Stats();
-var State = {
+const stats = new Stats();
+
+const FOV = Math.PI / 3;
+const State = {
   EDITING: 0,
   SIMULATING: 1
 };
 
-var GRID_WIDTH = 40,
-  GRID_HEIGHT = 20,
-  GRID_DEPTH = 20;
+const GRID_WIDTH = 10
+const GRID_HEIGHT = 10
+const GRID_DEPTH = 10;
 
-var PARTICLES_PER_CELL = 10;
+const PARTICLES_PER_CELL = 1;
 
 
 
@@ -94,21 +95,21 @@ export class FluidParticles {
       ];
 
       this.presetButton = document.getElementById('preset-button');
-      this.presetButton.addEventListener('click', (function() {
-        this.editedSinceLastPreset = false;
+      // this.presetButton.addEventListener('click', (function() {
+      //   this.editedSinceLastPreset = false;
 
-        this.boxEditor.boxes.length = 0;
+      //   this.boxEditor.boxes.length = 0;
 
-        var preset = PRESETS[this.currentPresetIndex];
-        for (var i = 0; i < preset.length; ++i) {
-          this.boxEditor.boxes.push(preset[i].clone());
-        }
+      //   var preset = PRESETS[this.currentPresetIndex];
+      //   for (var i = 0; i < preset.length; ++i) {
+      //     this.boxEditor.boxes.push(preset[i].clone());
+      //   }
 
-        this.currentPresetIndex = (this.currentPresetIndex + 1) % PRESETS.length;
+      //   this.currentPresetIndex = (this.currentPresetIndex + 1) % PRESETS.length;
 
-        this.redrawUI();
+      //   this.redrawUI();
 
-      }).bind(this));
+      // }).bind(this));
 
 
 
