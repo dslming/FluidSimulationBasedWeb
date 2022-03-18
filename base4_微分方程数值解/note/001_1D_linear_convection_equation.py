@@ -34,7 +34,4 @@ for n in range(nt):  #loop for values of n from 0 to nt, so it will run nt times
       u[i] = un[i] - c * dt / dx * (un[i] - un[i-1])
 
 pyplot.plot(numpy.linspace(0, 2, nx), u)
-
-
-while True:
-  pyplot.pause(0.05)
+pyplot.show()

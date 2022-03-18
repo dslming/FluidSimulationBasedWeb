@@ -23,5 +23,4 @@ pyplot.plot(numpy.linspace(0, 2, nx), u)
 
 
 
-while True:
-  pyplot.pause(0.05)
+pyplot.show()
