@@ -1,30 +1,38 @@
-# 改进欧拉
+import numpy
+from matplotlib import pyplot
 
-import numpy                       #here we load numpy
-from matplotlib import pyplot      #here we load matplotlib
-import time, sys                   #and load some utilities
-
-#解决中文显示问题
-pyplot.rcParams['font.sans-serif'] = ['Arial Unicode MS']
-
-dt = .1
-nx = 10
+dt = .1 # 时间步长
+nx = 5 # 离散数量
 
 y = numpy.zeros(nx)
+y_pro = numpy.zeros(nx)
 y_exact = numpy.zeros(nx)
 
 y[0] = 1
+y_pro[0] = 1
 
+# 微分方程 f' = 2y - 1
+def fun(y):
+  return 2*y-1
+
+# 精确解
 for n in range(nx):
-  # y_exact[n] = 1/2*(numpy.exp(n*2*dt)+1)
-  if n > 0:
-    y_bar =  (2*y[n-1] - 1)*dt + y[n-1]
-    y[n] = y[n-1] + dt/2*( 2*y[n-1] - 1
+  y_exact[n] = 1/2*(numpy.exp(n*2*dt)+1)
 
-pyplot.plot(numpy.linspace(0, dt*nx, nx), y,color='red',linewidth=1.0,linestyle='--',label='前向欧拉')
+# 改进的欧拉
+for n in range(nx):
+  if n < nx-1:
+    y_bar = y_pro[n] + fun(y_pro[n])*dt
+    y_pro[n+1] = y_pro[n] + dt/2*( fun(y_bar) + fun(y_pro[n]))
 
-pyplot.plot(numpy.linspace(0, dt*nx, nx), y_exact,color='blue',linewidth=1.0,linestyle='-',label='解析解')
+# 前向欧拉
+for n in range(nx):
+  if n < nx-1:
+    y[n+1] = (2*y[n] - 1)*dt + y[n]
+
+# 绘图
+pyplot.plot(numpy.linspace(0, dt*nx, nx), y,color='green',linewidth=1.0,linestyle='--',label='forward Euler')
+pyplot.plot(numpy.linspace(0, dt*nx, nx), y_pro,color='red',linewidth=1.0,linestyle="-.", label='evolve Euler')
+pyplot.plot(numpy.linspace(0, dt*nx, nx), y_exact,color='blue',linewidth=1.0,linestyle='-',label='exact')
 pyplot.legend()
-
-while True:
-  pyplot.pause(0.05)
+pyplot.show()
