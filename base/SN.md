@@ -21,7 +21,7 @@ $$
 ![alt](./im/002.svg)
 [图片出处](https://zh.wikipedia.org/wiki/%E7%BA%B3%E7%BB%B4-%E6%96%AF%E6%89%98%E5%85%8B%E6%96%AF%E6%96%B9%E7%A8%8B)
 
-和**质量守恒**公式:
+和**质量守恒**公式(不可压缩流体条件)
 $$\nabla \cdot \boldsymbol{v} = 0$$
 
 $\boldsymbol{v}(x,y,t)$ 速度矢量
