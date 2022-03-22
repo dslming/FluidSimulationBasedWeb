@@ -14,3 +14,30 @@ https://nbviewer.org/github/barbagroup/CFDPython/blob/master/lessons/01_Step_1.i
 https://www.bilibili.com/video/av20999595/
 
 微分方程数值分析基础教程 林群 pdf
+
+
+### 一 偏微分方程
+#### 1 热方程（抛物线方程）
+$$
+\frac{\partial w}{\partial t}-\frac{\partial^2w}{\partial x^2}=0
+$$
+
+#### 2 波动方程(双曲方程)
+Wave equation/双曲偏微分方程(Hyperbolic partial differential equation)
+
+$$
+\frac{\partial^2w}{\partial t^2}-\frac{\partial^2w}{\partial x^2 }=0
+$$
+
+
+#### 3 拉普拉斯方程（椭圆方程）
+$$
+\frac{\partial^2w}{\partial x^2}+\frac{\partial^2w}{\partial y^2 }=0
+$$
+
+
+#### 二 求解双曲偏微分方程
+- 迎风差分(upwind difference)
+$$
+\frac{}{}
+$$
