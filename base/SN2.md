@@ -1,5 +1,7 @@
 > https://yangwc.com/2019/05/01/fluidSimulation/#4%E3%80%81%E4%B8%8D%E5%8F%AF%E5%8E%8B%E7%BC%A9%E6%80%A7
 
+https://www.youtube.com/watch?v=VddQZH_Ppd0
+
 $$
 \frac{\partial \vec u}{\partial t}+\vec u\cdot \nabla \vec u+\frac1\rho \nabla p=\vec g+\nu \nabla \cdot \nabla \vec u
 \tag {2.1}
@@ -50,3 +52,114 @@ $$
  \nabla \cdot\frac1\rho \nabla p=
  \nabla \cdot(-\vec u\cdot  \nabla \vec u+\vec g+\nu \cdot \nabla \vec u) \tag{2.18}
 $$
+
+#### 无粘流体
+
+$$
+\rho \frac{\partial \vec u}{\partial t} +
+\rho \vec u\cdot \nabla \vec u = - \nabla p +
+\rho \vec g
+\tag {2.1}
+$$
+
+对流项:
+
+$$
+\frac{\partial \vec u}{\partial t} + \vec u\cdot \nabla \vec u= 0
+$$
+
+外力:
+
+$$
+\rho \frac{\partial \vec u}{\partial t}  = \rho \vec g
+$$
+
+压力投影:(Pressure projection)
+
+$$
+\rho  \frac{\partial \vec u}{\partial t} = -\nabla p
+$$
+
+前项更新（First-Order update）
+
+$$
+v^{t+1} = vt - \frac{\Delta t}{\rho}\nabla p
+$$
+
+对上式两边取散度:
+
+$$
+\nabla \cdot v^{t+1} =
+\nabla \cdot vt -
+\frac{\Delta t}{\rho} \nabla \cdot \nabla p
+$$
+
+因为约束:
+
+$$
+\nabla \cdot v = 0
+$$
+
+所以:
+
+$$
+\nabla \cdot v^{t+1} =
+\nabla \cdot v^t -
+\frac{\Delta t}{\rho} \nabla \cdot \nabla p = 0
+$$
+
+整理把已知条件放在右边,得到柏松方程:
+
+$$
+\nabla \cdot \nabla p = \frac {\rho} {\Delta t} \nabla \cdot v^t
+$$
+
+使用有限差分求解该柏松方程。（finite differences）
+
+二维散度公式：
+
+$$
+\nabla \cdot \vec v^t = \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y}
+$$
+
+使用一阶差分公式离散:
+
+$$
+\nabla \cdot \vec v^t =
+\frac{u_{x+1},y - u_{x,y}}{\Delta x} +
+ \frac{u_{y+1},y - u_{x,y}}{\Delta y}
+$$
+
+写成矩阵形式:
+
+$$
+\nabla \cdot \vec v^t =
+\left[
+\begin{matrix}
+-\frac{1}{\Delta x} & \frac{1}{\Delta x} & -\frac{1}{\Delta y} & \frac{1}{\Delta y} \\
+\end{matrix}
+\right] *
+\left[
+\begin{matrix}
+u_{xy} \\
+u_{+1,y} \\
+u_{x,y} \\
+u_{x,y-1}
+\end{matrix}
+\right] =
+B * q_i
+$$
+
+梯度：
+
+$$
+\nabla p =
+\left(
+\begin{matrix}
+\frac{\partial p}{\partial x} \\
+\frac{\partial p}{\partial y}
+\end{matrix}
+\right)
+$$
+
+共轭梯度法
