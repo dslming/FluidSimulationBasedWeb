@@ -26,18 +26,45 @@ $$
 Wave equation/双曲偏微分方程(Hyperbolic partial differential equation)
 
 $$
-\frac{\partial^2w}{\partial t^2}-\frac{\partial^2w}{\partial x^2 }=0
+\frac{\partial^2 u}{\partial t^2}-\frac{\partial^2 u}{\partial x^2 }=0
 $$
 
 
 #### 3 拉普拉斯方程（椭圆方程）
 $$
-\frac{\partial^2w}{\partial x^2}+\frac{\partial^2w}{\partial y^2 }=0
+\frac{\partial^2 u}{\partial x^2}+\frac{\partial^2 u}{\partial y^2 }=0
 $$
 
 
-#### 二 求解双曲偏微分方程
+#### 有限差分格式
+前向差分:
+$$
+y_i' = \frac{y_{i+1} - y_i}{x_{i+1}-x_{i}}
+$$
+
+后向差分:
+$$
+y_i' = \frac{y_{i} - y_{i-1}}{x_{i}-x_{i-1}}
+$$
+
+中心差分:
+$$
+y_i' = \frac{y_{i+1} - y_{i-1}}{2h}
+$$
+
+三种差分示意图:
+![alt](./img/001.png)
+
+中心差分格式, 一般用于扩散项
+迎/逆风差分, 用于对流项
+
+
+[工程师的数值方法](https://folk.ntnu.no/leifh/teaching/tkt4140/)
 - 迎风差分(upwind difference)
-$$
-\frac{}{}
-$$
+- Lax-Wendroff格式
+- Maccormack格式
+
+逆风:
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-90-computational-methods-in-aerospace-engineering-spring-2014/numerical-methods-for-partial-differential-equations/upwinding-and-the-cfl-condition/
+
+https://folk.ntnu.no/leifh/teaching/tkt4140/._main070.html
