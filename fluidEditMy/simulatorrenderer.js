@@ -66,6 +66,16 @@ export class SimulatorRenderer {
     this.camera.onMouseUp(event);
   }
 
+  /**
+   *
+   * @param {*} particlesWidth 512
+   * @param {*} particlesHeight 60
+   * @param {*} particlePositions []
+   * @param {*} gridSize [40,20,20]
+   * @param {*} gridResolution [32,16,16]
+   * @param {* } particleDensity 10, 粒子密度是每个模拟网格单元的粒子数
+   * @param {*} sphereRadius 0.2
+   */
   reset(particlesWidth, particlesHeight, particlePositions, gridSize, gridResolution, particleDensity, sphereRadius) {
     this.simulator.reset(particlesWidth, particlesHeight, particlePositions, gridSize, gridResolution, particleDensity);
     this.renderer.reset(particlesWidth, particlesHeight, sphereRadius);

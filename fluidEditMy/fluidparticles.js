@@ -15,11 +15,11 @@ const State = {
   SIMULATING: 1
 };
 
-const GRID_WIDTH = 10
-const GRID_HEIGHT = 10
-const GRID_DEPTH = 10;
+const GRID_WIDTH = 40
+const GRID_HEIGHT = 20
+const GRID_DEPTH = 20
 
-const PARTICLES_PER_CELL = 1;
+const PARTICLES_PER_CELL = 10;
 
 
 
@@ -95,21 +95,21 @@ export class FluidParticles {
       ];
 
       this.presetButton = document.getElementById('preset-button');
-      // this.presetButton.addEventListener('click', (function() {
-      //   this.editedSinceLastPreset = false;
+      this.presetButton.addEventListener('click', (function() {
+        this.editedSinceLastPreset = false;
 
-      //   this.boxEditor.boxes.length = 0;
+        this.boxEditor.boxes.length = 0;
 
-      //   var preset = PRESETS[this.currentPresetIndex];
-      //   for (var i = 0; i < preset.length; ++i) {
-      //     this.boxEditor.boxes.push(preset[i].clone());
-      //   }
+        var preset = PRESETS[this.currentPresetIndex];
+        for (var i = 0; i < preset.length; ++i) {
+          this.boxEditor.boxes.push(preset[i].clone());
+        }
 
-      //   this.currentPresetIndex = (this.currentPresetIndex + 1) % PRESETS.length;
+        this.currentPresetIndex = (this.currentPresetIndex + 1) % PRESETS.length;
 
-      //   this.redrawUI();
+        this.redrawUI();
 
-      // }).bind(this));
+      }).bind(this));
 
 
 
@@ -117,7 +117,10 @@ export class FluidParticles {
       // parameters/sliders
 
       //using gridCellDensity ensures a linear relationship to particle count
-      this.gridCellDensity = 0.5; //simulation grid cell density per world space unit volume
+      // 使用gridCellDensity可确保与粒子数的线性关系
+      //simulation grid cell density per world space unit volume
+      // 模拟每世界空间单位体积的网格单元密度
+      this.gridCellDensity = 0.5;
 
       this.timeStep = 1.0 / 60.0;
 
@@ -140,6 +143,7 @@ export class FluidParticles {
 
 
       this.presetButton.click();
+      this.startButton.click()
 
       ///////////////////////////////////////////////////////
       // interaction state stuff
@@ -293,11 +297,14 @@ export class FluidParticles {
     var gridResolutionZ = gridResolutionY * 1;
     var gridResolutionX = gridResolutionY * 2;
 
+    // x:y:z 32,16,16
     var totalGridCells = gridResolutionX * gridResolutionY * gridResolutionZ;
 
 
     var totalVolume = 0;
-    var cumulativeVolume = []; //at index i, contains the total volume up to and including box i (so index 0 has volume of first box, last index has total volume)
+    //at index i, contains the total volume up to and including box i (so index 0 has volume of first box, last index has total volume)
+    // 在索引i处，包含截至并包括方框i的总体积（因此索引0包含第一个方框的体积，最后一个索引包含总体积）
+    var cumulativeVolume = [];
 
     for (var i = 0; i < boxEditor.boxes.length; ++i) {
       var box = boxEditor.boxes[i];
@@ -309,6 +316,7 @@ export class FluidParticles {
 
     var fractionFilled = totalVolume / (GRID_WIDTH * GRID_HEIGHT * GRID_DEPTH);
 
+    // 所需粒子数
     var desiredParticleCount = fractionFilled * totalGridCells * PARTICLES_PER_CELL; //theoretical number of particles
 
     return desiredParticleCount;
@@ -319,9 +327,12 @@ export class FluidParticles {
   startSimulation() {
     this.state = State.SIMULATING;
 
-    var desiredParticleCount = this.getParticleCount(); //theoretical number of particles
+    //theoretical number of particles
+    var desiredParticleCount = this.getParticleCount();
     var particlesWidth = 512; //we fix particlesWidth
-    var particlesHeight = Math.ceil(desiredParticleCount / particlesWidth); //then we calculate the particlesHeight that produces the closest particle count
+    //then we calculate the particlesHeight that produces the closest particle count
+    //然后我们计算产生最接近粒子数的粒子高度
+    var particlesHeight = Math.ceil(desiredParticleCount / particlesWidth);
 
     var particleCount = particlesWidth * particlesHeight;
     var particlePositions = [];

@@ -33,8 +33,10 @@ void main () {
     vec3 cellIndex = floor(get3DFragCoord(u_gridResolution + 1.0));
 
     //make sure we're in the right slice to prevent bleeding
+    // 确保我们在正确的切片中以防止出血
     if (cellIndex.z == v_zIndex) {
         //staggered grid position and therefor weight is different for x, y, z and scalar values
+        // 交错网格位置和权重对于x、y、z和标量值是不同的
         vec3 xPosition = vec3(cellIndex.x, cellIndex.y + 0.5, cellIndex.z + 0.5);
         float xWeight = k(v_position - xPosition);
 

@@ -21,6 +21,7 @@ export class Simulator {
 
   /*
   we use a staggered MAC grid
+  我们使用交错的MAC网格
   this means the velocity grid width = grid width + 1 and velocity grid height = grid height + 1 and velocity grid depth = grid depth + 1
   a scalar for cell [i, j, k] is positionally located at [i + 0.5, j + 0.5, k + 0.5]
   x velocity for cell [i, j, k] is positionally located at [i, j + 0.5, k + 0.5]
@@ -100,8 +101,11 @@ export class Simulator {
     this.originalVelocityTexture = wgl.createTexture();
     this.weightTexture = wgl.createTexture();
 
-    this.markerTexture = wgl.createTexture(); //marks fluid/air, 1 if fluid, 0 if air
+    //marks fluid/air, 1 if fluid, 0 if air
+    this.markerTexture = wgl.createTexture();
+    // 发散纹理
     this.divergenceTexture = wgl.createTexture();
+    // 压力
     this.pressureTexture = wgl.createTexture();
     this.tempSimulationTexture = wgl.createTexture();
 
@@ -185,7 +189,15 @@ export class Simulator {
   //expects an array of [x, y, z] particle positions
   //gridSize and gridResolution are both [x, y, z]
 
-  //particleDensity is particles per simulation grid cell
+  /**
+   *
+   * @param {*} particlesWidth 512
+   * @param {*} particlesHeight 60
+   * @param {*} particlePositions   [x,y,z]
+   * @param {* } gridSize [40, 20, 20]
+   * @param {* } gridResolution [32, 16, 16]
+   * @param {*} particleDensity 10
+   */
   reset(particlesWidth, particlesHeight, particlePositions, gridSize, gridResolution, particleDensity) {
 
     this.particlesWidth = particlesWidth;
@@ -201,9 +213,11 @@ export class Simulator {
 
     this.particleDensity = particleDensity;
 
+    // 速度纹理宽高
     this.velocityTextureWidth = (this.gridResolutionX + 1) * (this.gridResolutionZ + 1);
     this.velocityTextureHeight = (this.gridResolutionY + 1);
 
+    // 标量纹理宽高
     this.scalarTextureWidth = this.gridResolutionX * this.gridResolutionZ;
     this.scalarTextureHeight = this.gridResolutionY;
 
@@ -212,9 +226,9 @@ export class Simulator {
     ///////////////////////////////////////////////////////////
     // create particle data
 
-    var particleCount = this.particlesWidth * this.particlesHeight;
+    // var particleCount = this.particlesWidth * this.particlesHeight;
 
-    //fill particle vertex buffer containing the relevant texture coordinates
+    // fill particle vertex buffer containing the relevant texture coordinates
     // 填充包含相关纹理坐标的粒子顶点缓冲区
     var particleTextureCoordinates = new Float32Array(this.particlesWidth * this.particlesHeight * 2);
     for (var y = 0; y < this.particlesHeight; ++y) {
@@ -223,10 +237,10 @@ export class Simulator {
         particleTextureCoordinates[(y * this.particlesWidth + x) * 2 + 1] = (y + 0.5) / this.particlesHeight;
       }
     }
-
     wgl.bufferData(this.particleVertexBuffer, wgl.ARRAY_BUFFER, particleTextureCoordinates, wgl.STATIC_DRAW);
 
-    //generate initial particle positions amd create particle position texture for them
+    // generate initial particle positions amd create particle position texture for them
+    // 生成初始粒子位置并为其创建粒子位置纹理
     var particlePositionsData = new Float32Array(this.particlesWidth * this.particlesHeight * 4);
     var particleRandoms = new Float32Array(this.particlesWidth * this.particlesHeight * 4);
     for (var i = 0; i < this.particlesWidth * this.particlesHeight; ++i) {
@@ -235,6 +249,7 @@ export class Simulator {
       particlePositionsData[i * 4 + 2] = particlePositions[i][2];
       particlePositionsData[i * 4 + 3] = 0.0;
 
+      // 粒子方向
       var theta = Math.random() * 2.0 * Math.PI;
       var u = Math.random() * 2.0 - 1.0;
       particleRandoms[i * 4] = Math.sqrt(1.0 - u * u) * Math.cos(theta);
@@ -250,7 +265,8 @@ export class Simulator {
     wgl.rebuildTexture(this.particleVelocityTexture, wgl.RGBA, this.simulationNumberType, this.particlesWidth, this.particlesHeight, null, wgl.CLAMP_TO_EDGE, wgl.CLAMP_TO_EDGE, wgl.NEAREST, wgl.NEAREST);
     wgl.rebuildTexture(this.particleVelocityTextureTemp, wgl.RGBA, this.simulationNumberType, this.particlesWidth, this.particlesHeight, null, wgl.CLAMP_TO_EDGE, wgl.CLAMP_TO_EDGE, wgl.NEAREST, wgl.NEAREST);
 
-    wgl.rebuildTexture(this.particleRandomTexture, wgl.RGBA, wgl.FLOAT, this.particlesWidth, this.particlesHeight, particleRandoms, wgl.CLAMP_TO_EDGE, wgl.CLAMP_TO_EDGE, wgl.NEAREST, wgl.NEAREST); //contains a random normalized direction for each particle
+    wgl.rebuildTexture(this.particleRandomTexture, wgl.RGBA, wgl.FLOAT, this.particlesWidth, this.particlesHeight, particleRandoms, wgl.CLAMP_TO_EDGE, wgl.CLAMP_TO_EDGE, wgl.NEAREST, wgl.NEAREST);
+    //contains a random normalized direction for each particle
 
 
 
@@ -262,7 +278,8 @@ export class Simulator {
     wgl.rebuildTexture(this.originalVelocityTexture, wgl.RGBA, this.simulationNumberType, this.velocityTextureWidth, this.velocityTextureHeight, null, wgl.CLAMP_TO_EDGE, wgl.CLAMP_TO_EDGE, wgl.LINEAR, wgl.LINEAR);
     wgl.rebuildTexture(this.weightTexture, wgl.RGBA, this.simulationNumberType, this.velocityTextureWidth, this.velocityTextureHeight, null, wgl.CLAMP_TO_EDGE, wgl.CLAMP_TO_EDGE, wgl.LINEAR, wgl.LINEAR);
 
-    wgl.rebuildTexture(this.markerTexture, wgl.RGBA, wgl.UNSIGNED_BYTE, this.scalarTextureWidth, this.scalarTextureHeight, null, wgl.CLAMP_TO_EDGE, wgl.CLAMP_TO_EDGE, wgl.LINEAR, wgl.LINEAR); //marks fluid/air, 1 if fluid, 0 if air
+    //marks fluid/air, 1 if fluid, 0 if air
+    wgl.rebuildTexture(this.markerTexture, wgl.RGBA, wgl.UNSIGNED_BYTE, this.scalarTextureWidth, this.scalarTextureHeight, null, wgl.CLAMP_TO_EDGE, wgl.CLAMP_TO_EDGE, wgl.LINEAR, wgl.LINEAR);
     wgl.rebuildTexture(this.divergenceTexture, wgl.RGBA, this.simulationNumberType, this.scalarTextureWidth, this.scalarTextureHeight, null, wgl.CLAMP_TO_EDGE, wgl.CLAMP_TO_EDGE, wgl.LINEAR, wgl.LINEAR);
     wgl.rebuildTexture(this.pressureTexture, wgl.RGBA, this.simulationNumberType, this.scalarTextureWidth, this.scalarTextureHeight, null, wgl.CLAMP_TO_EDGE, wgl.CLAMP_TO_EDGE, wgl.LINEAR, wgl.LINEAR);
     wgl.rebuildTexture(this.tempSimulationTexture, wgl.RGBA, this.simulationNumberType, this.scalarTextureWidth, this.scalarTextureHeight, null, wgl.CLAMP_TO_EDGE, wgl.CLAMP_TO_EDGE, wgl.LINEAR, wgl.LINEAR);
@@ -274,6 +291,8 @@ export class Simulator {
 
   //you need to call reset() with correct parameters before simulating
   //mouseVelocity, mouseRayOrigin, mouseRayDirection are all expected to be arrays of 3 values
+  //在模拟之前，需要使用正确的参数调用reset（）
+  //mouseVelocity、mouseRayOrigin和mouseRayDirection都应该是3个值的数组
   simulate(timeStep, mouseVelocity, mouseRayOrigin, mouseRayDirection) {
     if (timeStep === 0.0) return;
 
@@ -310,8 +329,11 @@ export class Simulator {
     //we transfer particle velocities to the grid in two steps
     //in the first step, we accumulate weight * velocity into tempVelocityTexture and then weight into weightTexture
     //in the second step: velocityTexture = tempVelocityTexture / weightTexture
-
     //we accumulate into velocityWeightTexture and then divide into velocityTexture
+    //我们分两步将粒子速度传递到网格
+    //第一步，我们将权重*速度累加到 tempVelocityTexture 中，然后将权重累加到weightTexture中
+    //第二步：velocityTexture=tempVelocityTexture/weightTexture
+    //我们积累成velocityWeightTexture，然后分成velocityTexture
 
     var transferToGridDrawState = wgl.createDrawState()
       .bindFramebuffer(this.simulationFramebuffer)
@@ -335,12 +357,11 @@ export class Simulator {
     wgl.clear(
       wgl.createClearState().bindFramebuffer(this.simulationFramebuffer).clearColor(0, 0, 0, 0),
       wgl.COLOR_BUFFER_BIT);
-
     transferToGridDrawState.uniform1i('u_accumulate', 0)
 
+    // 每一个粒子都会被一层一层地从
     //each particle gets splatted layer by layer from z - (SPLAT_SIZE - 1) / 2 to z + (SPLAT_SIZE - 1) / 2
-    var SPLAT_DEPTH = 5;
-
+    var SPLAT_DEPTH = 1; // -2,-1,0,1,2
     for (var z = -(SPLAT_DEPTH - 1) / 2; z <= (SPLAT_DEPTH - 1) / 2; ++z) {
       transferToGridDrawState.uniform1f('u_zOffset', z);
       wgl.drawArrays(transferToGridDrawState, wgl.POINTS, 0, this.particlesWidth * this.particlesHeight);
