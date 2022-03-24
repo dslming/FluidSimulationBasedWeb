@@ -81,3 +81,5 @@ Level-set method(水平集法)
 Marker-and-cell method(标记和单元方法)
 particle-in-cell(PIC)
 Fluid-Implicit-Particle (FLIP)
+
+MAC: http://www.thevisualroom.com/marker_and_cell_method.html
