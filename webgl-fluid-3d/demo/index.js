@@ -1,7 +1,7 @@
 'use strict'
 
 // import _Compute from '../../lib'
-import {_ParticleBuffer, BoxRegion} from './particles'
+import { _ParticleBuffer, BoxRegion } from './particles'
 import _MAC from './grid'
 import Bound from './bound'
 import Renderer from './renderer'
@@ -21,12 +21,12 @@ if (!gl.webgl2) {
   const ext_color_buffer_float = gl.getExtension("EXT_color_buffer_float")
 }
 
-const {ParticlePainter, GridPainter} = Painters(gl)
+const { ParticlePainter, GridPainter } = Painters(gl)
 
 const ParticleBuffer = _ParticleBuffer(gl)
 
-const {MACGrid} = _MAC(gl)
-const {Sim} = _Sim(gl)
+const { MACGrid } = _MAC(gl)
+const { Sim } = _Sim(gl)
 
 
 var sim
@@ -36,21 +36,27 @@ var gridPainter = GridPainter(null)
 renderer.add(gridPainter)
 renderer.add(particlePainter)
 
-function initialize(settings) { 
+function initialize(settings) {
   var CELL_SIZE = 2 / Math.cbrt(settings.density) // ~8 particles per cell
-  var box = new BoxRegion(4*settings.density, new Bound({
-    minX: -0.6, maxX: 0.0,
-    minY: -0.4, maxY: 0.4,
-    minZ: -0.4, maxZ: 0.4
+  var box = new BoxRegion(4 * settings.density, new Bound({
+    minX: -0.6,
+    maxX: 0.0,
+    minY: -0.4,
+    maxY: 0.4,
+    minZ: -0.4,
+    maxZ: 0.4
   }))
   var particles = new ParticleBuffer()
   particles.addRegion(box)
   particles.create()
 
   var grid = new MACGrid(new Bound({
-    minX: -0.8, maxX: 0.8,
-    minY: -0.5, maxY: 0.5,
-    minZ: -0.5, maxZ: 0.5
+    minX: -0.8,
+    maxX: 0.8,
+    minY: -0.5,
+    maxY: 0.5,
+    minZ: -0.5,
+    maxZ: 0.5
   }), CELL_SIZE)
 
   particlePainter.setBuffer(particles)
@@ -74,7 +80,7 @@ var drawloop = Loop(
     gl.bindFramebuffer(gl.FRAMEBUFFER, null)
     gl.viewport(0, 0, canvas.width, canvas.height)
     renderer.draw()
-  }  
+  }
 )
 
 drawloop.frameStats.setMode(1)
@@ -122,8 +128,8 @@ var simulationControls = {
   },
   precondition: true,
   ipp: true,
-  density: 100000,  // particles per cubic meter
-  solverSteps: 100,
+  density: 8000, // particles per cubic meter
+  solverSteps: 10,
   smooth: 5
 }
 

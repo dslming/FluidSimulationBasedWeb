@@ -4,7 +4,7 @@ const THREE = require('three')
 const OrbitControls = require('three-orbit-controls')(THREE)
 
 function Camera(canvas) {
-  var camera = new THREE.PerspectiveCamera( 10, canvas.width / canvas.height, 0.1, 1000 );
+  var camera = new THREE.PerspectiveCamera(10, canvas.width / canvas.height, 0.1, 1000);
 
   var controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
@@ -27,18 +27,21 @@ export default function Renderer(gl) {
 
   function setup() {
     camera = Camera(canvas)
-    camera.position.set(3,1,12);
+    camera.position.set(3, 1, 12);
   }
-  
+
   var cameraMat = new THREE.Matrix4();
+
   function draw() {
     camera.controls.update()
 
     camera.updateMatrixWorld();
-    camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-    
+    // camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+    camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
+
+
     cameraMat.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-    
+
     for (let i = 0; i < drawables.length; ++i) {
       drawables[i].draw({
         camera,
@@ -62,7 +65,7 @@ export default function Renderer(gl) {
     canvas.height = window.innerHeight
     camera.aspect = canvas.width / canvas.height;
     camera.updateProjectionMatrix();
-    gl.viewport(0, 0 , canvas.width, canvas.height)
+    gl.viewport(0, 0, canvas.width, canvas.height)
   }
 
   window.addEventListener('load', e => {
