@@ -31,12 +31,17 @@ void main () {
     v_position = position;
 
     vec3 cellIndex = vec3(floor(position.xyz));
-    v_zIndex = cellIndex.z + u_zOffset; //offset into the right layer
+    //offset into the right layer
+    // 偏移到正确的层
+    v_zIndex = cellIndex.z + u_zOffset;
 
-    vec2 textureCoordinates = vec2(
-        v_zIndex * (u_gridResolution.x + 1.0) + cellIndex.x + 0.5,
-        cellIndex.y + 0.5) / vec2((u_gridResolution.x + 1.0) * (u_gridResolution.z + 1.0),
-        u_gridResolution.y + 1.0);
+    float x = v_zIndex * (u_gridResolution.x + 1.0) + cellIndex.x + 0.5;
+    float y = cellIndex.y + 0.5;
 
+    vec2 temp = vec2(
+        (u_gridResolution.x + 1.0) * (u_gridResolution.z + 1.0),
+        u_gridResolution.y + 1.0
+    );
+    vec2 textureCoordinates = vec2(x,y) / temp;
     gl_Position = vec4(textureCoordinates * 2.0 - 1.0, 0.0, 1.0);
 }
