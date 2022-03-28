@@ -1,0 +1,401 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>WebGL - Bilinear interpolation within a cell</title>
+        <link href="css/jquery-ui-1.8.13.custom.css" type="text/css" rel="stylesheet" />
+        <link href="css/style.css" type="text/css" rel="stylesheet" />
+        <script type="text/javascript" src="js/jquery-1.5.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery-ui-1.8.13.custom.min.js"></script>
+        <script type="text/javascript" src="webgl-utils.js"></script>
+        <!-- <script src="./lib/MathJax.js?config=TeX-AMS_HTML"></script> -->
+        <script>
+            window.onload = main;
+            // MathJax.Hub.Config({ menuSettings: { zoom: "Click", zscale: "125%" } });
+            var gl = 0;
+            var cellBuff = 0;
+            var lineBuff = 0;
+            var discTex = 0;
+            var contTex = 0;
+            var currTex = 0;
+            var lineProg = 0;
+            var positionLocation = 0;
+
+            var f0Val = 0.0;
+            var f1Val = 1.0;
+            var f2Val = 1.0;
+            var f3Val = 0.0;
+
+            function main() {
+                initGL();
+
+                // Create the textures
+                contTex = gl.createTexture();
+                discTex = gl.createTexture();
+                currTex = document.getElementById("tex_id").value == "1" ? discTex : contTex;
+
+                var image = new Image();
+                image.onload = function () {
+                    handleTextureLoaded(image, contTex);
+                };
+                image.src = "grayscale.png"; // MUST BE SAME DOMAIN!!!
+
+                var img2 = new Image();
+                img2.onload = function () {
+                    handleTextureLoaded(img2, discTex);
+                };
+                img2.src = "grayscaled.png";
+            }
+
+            function initGL() {
+                // Get A WebGL context
+                var canvas = document.getElementById("canvas");
+                gl = getWebGLContext(canvas);
+                if (!gl) return;
+
+                // setup GLSL program
+                vertexShader = createShaderFromScriptElement(gl, "2d-vertex-shader");
+                fragmentShader = createShaderFromScriptElement(gl, "2d-fragment-shader");
+                lineShader = createShaderFromScriptElement(gl, "line-fragment-shader");
+                program = createProgram(gl, [vertexShader, fragmentShader]);
+                gl.useProgram(program);
+
+                // look up where the vertex data needs to go.
+                positionLocation = gl.getAttribLocation(program, "a_position");
+                var texCoordLocation = gl.getAttribLocation(program, "a_texCoord");
+                gl.enableVertexAttribArray(positionLocation);
+                gl.enableVertexAttribArray(texCoordLocation);
+
+                // provide texture coordinates for the rectangle.
+                var texCoordBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]), gl.STATIC_DRAW);
+                gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
+
+                // lookup uniforms
+                program.f0Location = gl.getUniformLocation(program, "u_f0");
+                program.f1Location = gl.getUniformLocation(program, "u_f1");
+                program.f2Location = gl.getUniformLocation(program, "u_f2");
+                program.f3Location = gl.getUniformLocation(program, "u_f3");
+
+                // set the resolution
+                //gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+
+                // Create a buffer for the position of the rectangle corners.
+                cellBuff = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, cellBuff);
+                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+                // Set a rectangle the same size as the image.
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0]), gl.STATIC_DRAW);
+
+                lineProg = createProgram(gl, [vertexShader, lineShader]);
+                gl.useProgram(lineProg);
+
+                // Create a buffer for the position of the lines.
+                lineBuff = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, lineBuff);
+                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+                // Set a rectangle the same size as the image.
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, 1.0]), gl.DYNAMIC_DRAW);
+
+                lineProg.grayLocation = gl.getUniformLocation(lineProg, "u_gray");
+
+                // create Labels
+                var parent = document.getElementById("label");
+                for (var i = 1; i < 10; ++i) {
+                    parent.appendChild(createLabel(i / 10, "-tdiv"));
+                    parent.appendChild(createLabel(i / 10, "-bdiv"));
+                    parent.appendChild(createLabel(i / 10, "-ldiv"));
+                    parent.appendChild(createLabel(i / 10, "-rdiv"));
+                }
+            }
+
+            function handleTextureLoaded(image, texture) {
+                // Upload the image into the texture
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+                // Set the parameters so we can render any size image
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.generateMipmap(gl.TEXTURE_2D);
+
+                gl.bindTexture(gl.TEXTURE_2D, null);
+                update();
+            }
+
+            function updateLabel(val, min, max, name) {
+                var pos = ((val - min) / (max - min)) * 410 - 15;
+                var elem = document.getElementById(val + name);
+                elem.style.display = 15 < pos && pos < 365 ? "inline" : "none";
+                switch (name) {
+                    case "-ldiv":
+                    case "-rdiv":
+                        elem.style.top = pos + "px";
+                        break;
+                    case "-tdiv":
+                    case "-bdiv":
+                        elem.style.left = pos + "px";
+                        break;
+                }
+            }
+
+            function createLabel(val, name) {
+                var elem = document.createElement("div");
+                elem.id = val + name;
+                elem.style.position = "absolute";
+                elem.innerHTML = "<font color='" + (val < 0.4 ? "#030869" : "#f7fbff") + "'>" + val + "</font>";
+                switch (name) {
+                    case "-ldiv":
+                        elem.style.left = "3px";
+                        elem.style.top = "0px";
+                        break;
+                    case "-rdiv":
+                        elem.style.right = "3px";
+                        elem.style.top = "0px";
+                        break;
+                    case "-tdiv":
+                        elem.style.left = "0px";
+                        elem.style.top = "2px";
+                        break;
+                    case "-bdiv":
+                        elem.style.left = "0px";
+                        elem.style.top = "382px";
+                        break;
+                }
+                return elem;
+            }
+
+            function fixNumber(value, digits) {
+                return (value >= 0 ? " + " : " &ndash; ") + value.toFixed(digits).replace("-", "");
+            }
+
+            function update() {
+                // calculate values
+                var A = f1Val - f0Val;
+                var B = f2Val - f0Val;
+                var C = f0Val - f1Val - f2Val + f3Val;
+                var a0 = B / C;
+                var b0 = A / C;
+                var d = (f0Val * f3Val - f1Val * f2Val) / C;
+                document.getElementById("bilinear").innerHTML =
+                    "<i>f</i> (<i>&alpha;</i>, <i>&beta;</i>)&nbsp; =&nbsp; " +
+                    A.toFixed(2).replace("-", "&ndash;") +
+                    " <i>&alpha;</i> " +
+                    fixNumber(B, 2) +
+                    " <i>&beta;</i> " +
+                    fixNumber(C, 2) +
+                    " <i>&alpha; &beta;</i>" +
+                    fixNumber(f0Val, 2);
+                document.getElementById("center").innerHTML =
+                    "<i>f</i> (<i>&alpha;</i>, <i>&beta;</i>)&nbsp; =&nbsp; " +
+                    C.toFixed(2).replace("-", "&ndash;") +
+                    " (<i>&alpha;</i> " +
+                    fixNumber(a0, 3) +
+                    ") (<i>&beta;</i> " +
+                    fixNumber(b0, 3) +
+                    ") " +
+                    fixNumber(d, 3);
+                document.getElementById("midpoint").innerHTML = "Value at cell center (midpoint): " + ((f0Val + f1Val + f2Val + f3Val) * 0.25).toFixed(3);
+
+                gl.useProgram(program);
+                if (program.f0Location != -1) gl.uniform1f(program.f0Location, f0Val);
+                if (program.f1Location != -1) gl.uniform1f(program.f1Location, f1Val);
+                if (program.f2Location != -1) gl.uniform1f(program.f2Location, f2Val);
+                if (program.f3Location != -1) gl.uniform1f(program.f3Location, f3Val);
+
+                // Draw the rectangle.
+                gl.bindTexture(gl.TEXTURE_2D, currTex);
+                gl.bindBuffer(gl.ARRAY_BUFFER, cellBuff);
+                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+                // Draw the assymptotes.
+                if (document.getElementById("assymptotes").checked) {
+                    var delta = document.getElementById("delta");
+                    var dStr = d.toFixed(3).replace(/\.0+$|0+$/, "");
+                    delta.style.display = -1 <= a0 && a0 <= 0 && -1 <= b0 && b0 <= 0 ? "inline" : "none";
+                    delta.style.left = Math.min(5 - 400 * a0, 400 - dStr.length * 7.5) + "px";
+                    delta.style.top = Math.max(380 + 400 * b0, 0) + "px";
+                    delta.innerHTML = "<font color='" + (d < 0.55 ? "#030869" : "#f7fbff") + "'>" + dStr + "</font>";
+
+                    gl.useProgram(lineProg);
+                    if (lineProg.grayLocation != -1) gl.uniform1f(lineProg.grayLocation, d < 0.55 ? 0 : 0.8);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, lineBuff);
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array([-1.0, -1 - 2 * b0, 1.0, -1 - 2 * b0, -1 - 2 * a0, -1.0, -1 - 2 * a0, 1.0]));
+                    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+                    gl.drawArrays(gl.LINES, 0, 4);
+                } else document.getElementById("delta").style.display = "none";
+
+                for (var i = 1; i < 10; ++i) {
+                    updateLabel(i / 10, f2Val, f0Val, "-ldiv");
+                    updateLabel(i / 10, f0Val, f1Val, "-bdiv");
+                    updateLabel(i / 10, f3Val, f1Val, "-rdiv");
+                    updateLabel(i / 10, f2Val, f3Val, "-tdiv");
+                }
+            }
+
+            function randomInt(range) {
+                return Math.floor(Math.random() * range);
+            }
+        </script>
+        <!-- vertex shader -->
+        <script id="2d-vertex-shader" type="x-shader/x-vertex">
+            attribute vec2 a_position;
+            attribute vec2 a_texCoord;
+
+            varying vec2 v_texCoord;
+
+            void main() {
+               gl_Position = vec4(a_position, 0, 1);
+
+               // pass the texCoord to the fragment shader
+               // The GPU will interpolate this value between points.
+               v_texCoord = a_texCoord;
+            }
+        </script>
+        <!-- fragment shader -->
+        <script id="2d-fragment-shader" type="x-shader/x-fragment">
+            precision highp float;
+
+            // our texture
+            uniform sampler2D u_image;
+
+            uniform float u_f0;
+            uniform float u_f1;
+            uniform float u_f2;
+            uniform float u_f3;
+
+            // the texCoords passed in from the vertex shader.
+            varying vec2 v_texCoord;
+
+            void main() {
+               float gray = (1.0-v_texCoord.x)*(1.0-v_texCoord.y)*u_f0 +
+                 (1.0-v_texCoord.y)*v_texCoord.x*u_f1 +
+                 (1.0-v_texCoord.x)*v_texCoord.y*u_f2 +
+                 v_texCoord.x*v_texCoord.y*u_f3;
+               gl_FragColor = texture2D(u_image, vec2(gray, 0.5));
+            }
+        </script>
+        <script id="line-fragment-shader" type="x-shader/x-fragment">
+            precision highp float;
+
+            uniform float u_gray;
+
+            void main() {
+               gl_FragColor = vec4(u_gray,u_gray,u_gray,1);
+            }
+        </script>
+    </head>
+    <body>
+        <table style="padding: 0px; width: 400px">
+            <tr>
+                <td align="right">\(f_{01} =\)</td>
+                <td id="slider-f2-value" width="30px" class="val">1</td>
+                <td width="100px"><div id="slider-f2" /></td>
+                <td width="10px">&nbsp;</td>
+                <td width="100px"><div id="slider-f3" /></td>
+                <td align="right">\(f_{11} =\)</td>
+                <td id="slider-f3-value" width="30px" class="val">0</td>
+            </tr>
+            <tr>
+                <td colspan="7">
+                    <div id="label" style="position: relative"><div id="delta" style="position: absolute"></div></div>
+                    <canvas id="canvas" width="400" height="400" style="border: 1px solid gray"></canvas>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">\(f_{00} =\)</td>
+                <td id="slider-f0-value" class="val">0</td>
+                <td><div id="slider-f0" /></td>
+                <td>&nbsp;</td>
+                <td><div id="slider-f1" /></td>
+                <td align="right">\(f_{10} =\)</td>
+                <td id="slider-f1-value" class="val">1</td>
+            </tr>
+            <tr>
+                <td colspan="3"><input type="checkbox" id="assymptotes" checked onClick="update()" /> Draw assymptotes</td>
+                <td>&nbsp;</td>
+                <td colspan="3">
+                    <select onchange="texChanged()" id="tex_id">
+                        <option value="1">discrete colormap</option>
+                        <option value="2">continuous colormap</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="7" align="center"><img src="grayscaled.png" id="colormap" style="width: 350px; padding-top: 10px" /></td>
+            </tr>
+        </table>
+
+        <p class="small">Applet created by <a href="http://wwwcg.in.tum.de/group/persons/kehrer.html" target="_blank">Johannes Kehrer</a> for educational purpose.</p>
+        <div style="position: absolute; top: 0; left: 430px; width: 600px">
+            <h1>Bilinear interpolation within a cell (WebGL)</h1>
+            <p>
+                Given the four values at the vertices of a cell (unit square), the value at each point \((\alpha, \beta)\) within the cell can be obtained by
+                <a href="http://en.wikipedia.org/wiki/Bilinear_interpolation" target="_blank">bilinear interpolation</a>
+                $$\begin{eqnarray} f(\alpha, \beta) &=& (1 - \alpha) (1 - \beta) f_{00} + \alpha (1 - \beta) f_{10} + (1 - \alpha) \beta f_{01} + \alpha \beta f_{11} \\ &=& A\alpha + B\beta +
+                C\alpha\beta + D \end{eqnarray}$$ where \(A = f_{10}-f_{00},\, B = f_{01}-f_{00},\, C = f_{00}-f_{10}-f_{01}+f_{11}\) and \(D =f_{00}\). That is
+            </p>
+            <p id="bilinear" class="eqn"></p>
+            <p>
+                Note that the isolines within the cell are hyperbolas. We can transform the previous equation into the equation of a hyperbola: $$f(\alpha, \beta) = \gamma (\alpha - \alpha_0) (\beta -
+                \beta_0) + \delta$$ where \(\delta=(f_{00} f_{11} - f_{10} f_{01})/C\) is the function value at the intersection point \((\alpha_0, \beta_0)\) of the asymptotes with \(\alpha_0 =
+                -B/C\) and \(\beta_0 = -A/C\), i.e.,
+            </p>
+            <p id="center" class="eqn"></p>
+            <p>
+                The <a href="http://dx.doi.org/10.1109/VISUAL.1991.175782" target="_blank">asymptotic decider</a> evaluates \(\delta\) to resolve ambiguous cases in
+                <a href="http://en.wikipedia.org/wiki/Marching_cubes" target="_blank">Marching cubes</a>.
+            </p>
+            <p id="midpoint"></p>
+        </div>
+        <script>
+            $("#slider-f0").slider({ value: f0Val, max: 1, step: 0.01, range: "min", slide: updateF0 });
+            $("#slider-f1").slider({ value: f1Val, max: 1, step: 0.01, range: "min", slide: updateF1 });
+            $("#slider-f2").slider({ value: f2Val, max: 1, step: 0.01, range: "min", slide: updateF2 });
+            $("#slider-f3").slider({ value: f3Val, max: 1, step: 0.01, range: "min", slide: updateF3 });
+
+            function texChanged() {
+                var img = document.getElementById("colormap");
+                switch (document.getElementById("tex_id").value) {
+                    case "1":
+                        img.src = "grayscaled.png";
+                        currTex = discTex;
+                        break;
+                    case "2":
+                        img.src = "grayscale.png";
+                        currTex = contTex;
+                        break;
+                }
+                update();
+            }
+
+            function updateF0(event, ui) {
+                f0Val = ui.value;
+                $("#slider-f0-value").html(f0Val);
+                update();
+            }
+            function updateF1(event, ui) {
+                f1Val = ui.value;
+                $("#slider-f1-value").html(f1Val);
+                update();
+            }
+            function updateF2(event, ui) {
+                f2Val = ui.value;
+                $("#slider-f2-value").html(f2Val);
+                update();
+            }
+            function updateF3(event, ui) {
+                f3Val = ui.value;
+                $("#slider-f3-value").html(f3Val);
+                update();
+            }
+        </script>
+    </body>
+</html>

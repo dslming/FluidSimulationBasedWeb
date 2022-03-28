@@ -43,3 +43,7 @@ https://www.ibiblio.org/e-notes/webgl/gpu/contents.htm
 
 todo:
 Material Point Method(MPM)
+
+#### webgl 处理粒子位置:
+
+https://webgl2fundamentals.org/webgl/lessons/webgl-qna-how-to-process-particle-positions.html
