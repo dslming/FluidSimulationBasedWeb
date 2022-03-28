@@ -1,4 +1,5 @@
 //this does the divide in the weighted sum
+// 这就是加权和的除法
 
 precision highp float;
 

@@ -335,7 +335,7 @@ export class Simulator {
     //我们分两步将粒子速度传递到网格
     //第一步，我们将权重*速度累加到 tempVelocityTexture 中，然后将权重累加到 weightTexture 中
     //第二步：velocityTexture=tempVelocityTexture/weightTexture
-    //我们积累成 velocityWeightTexture，然后分成 velocityTexture
+    //我们积累成 velocityWeightTexture ，然后分成 velocityTexture
 
     var transferToGridDrawState = wgl.createDrawState()
       .bindFramebuffer(this.simulationFramebuffer)
@@ -401,6 +401,7 @@ export class Simulator {
 
     //////////////////////////////////////////////////////
     // mark cells with fluid
+    // 用液体标记细胞
 
     wgl.framebufferTexture2D(this.simulationFramebuffer, wgl.FRAMEBUFFER, wgl.COLOR_ATTACHMENT0, wgl.TEXTURE_2D, this.markerTexture, 0);
     wgl.clear(
@@ -421,6 +422,7 @@ export class Simulator {
     wgl.drawArrays(markDrawState, wgl.POINTS, 0, this.particlesWidth * this.particlesHeight);
     ////////////////////////////////////////////////////
     // save our original velocity grid
+    // 保存原始速度网格
 
     wgl.framebufferTexture2D(this.simulationFramebuffer, wgl.FRAMEBUFFER, wgl.COLOR_ATTACHMENT0, wgl.TEXTURE_2D, this.originalVelocityTexture, 0);
 
@@ -469,6 +471,7 @@ export class Simulator {
 
     /////////////////////////////////////////////////////
     // enforce boundary velocity conditions
+    // 强制执行边界速度条件
 
     wgl.framebufferTexture2D(this.simulationFramebuffer, wgl.FRAMEBUFFER, wgl.COLOR_ATTACHMENT0, wgl.TEXTURE_2D, this.tempVelocityTexture, 0);
 
@@ -489,9 +492,11 @@ export class Simulator {
 
     /////////////////////////////////////////////////////
     // update velocityTexture for non divergence
+    // 更新velocityTexture以获取非散度
 
 
     //compute divergence for pressure projection
+    // 计算压力投影的散度
 
     var divergenceDrawState = wgl.createDrawState()
 
@@ -547,6 +552,7 @@ export class Simulator {
 
 
     //subtract pressure gradient from velocity
+    // 从速度中减去压力梯度
 
     wgl.framebufferTexture2D(this.simulationFramebuffer, wgl.FRAMEBUFFER, wgl.COLOR_ATTACHMENT0, wgl.TEXTURE_2D, this.tempVelocityTexture, 0);
 
@@ -569,6 +575,7 @@ export class Simulator {
 
     /////////////////////////////////////////////////////////////
     // transfer velocities back to particles
+    // 将速度传回粒子
 
     wgl.framebufferTexture2D(this.simulationFramebuffer, wgl.FRAMEBUFFER, wgl.COLOR_ATTACHMENT0, wgl.TEXTURE_2D, this.particleVelocityTextureTemp, 0);
 
