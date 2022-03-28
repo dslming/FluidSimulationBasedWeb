@@ -8,11 +8,13 @@ export class Simulator {
 
   //simulation grid dimensions and resolution
   //all particles are in the world position space ([0, 0, 0], [GRID_WIDTH, GRID_HEIGHT, GRID_DEPTH])
+  // 所有的网格都在世界空间, ([0, 0, 0], [GRID_WIDTH, GRID_HEIGHT, GRID_DEPTH])
 
   //when doing most grid operations, we transform positions from world position space into the grid position space ([0, 0, 0], [GRID_RESOLUTION_X, GRID_RESOLUTION_Y, GRID_RESOLUTION_Z])
-
+  // 在执行大多数网格操作时，我们将位置从世界位置空间转换为网格位置空间（[0,0,0]，[grid_RESOLUTION_X，grid_RESOLUTION_Y，grid_RESOLUTION_Z]）
 
   //in grid space, cell boundaries are simply at integer values
+  // 在网格空间中，单元格边界只是整数值
 
   //we emulate 3D textures with tiled 2d textures
   //so the z slices of a 3d texture are laid out along the x axis
@@ -64,7 +66,7 @@ export class Simulator {
     ///////////////////////////////////////////////////////
     // simulation parameters
 
-    this.flipness = 0.99; //0 is full PIC, 1 is full FLIP
+    this.flipness = 1.; //0 is full PIC, 1 is full FLIP
 
 
     this.frameNumber = 0; //used for motion randomness
@@ -331,9 +333,9 @@ export class Simulator {
     //in the second step: velocityTexture = tempVelocityTexture / weightTexture
     //we accumulate into velocityWeightTexture and then divide into velocityTexture
     //我们分两步将粒子速度传递到网格
-    //第一步，我们将权重*速度累加到 tempVelocityTexture 中，然后将权重累加到weightTexture中
+    //第一步，我们将权重*速度累加到 tempVelocityTexture 中，然后将权重累加到 weightTexture 中
     //第二步：velocityTexture=tempVelocityTexture/weightTexture
-    //我们积累成velocityWeightTexture，然后分成velocityTexture
+    //我们积累成 velocityWeightTexture，然后分成 velocityTexture
 
     var transferToGridDrawState = wgl.createDrawState()
       .bindFramebuffer(this.simulationFramebuffer)
@@ -361,7 +363,7 @@ export class Simulator {
 
     // 每一个粒子都会被一层一层地从
     //each particle gets splatted layer by layer from z - (SPLAT_SIZE - 1) / 2 to z + (SPLAT_SIZE - 1) / 2
-    var SPLAT_DEPTH = 1; // -2,-1,0,1,2
+    var SPLAT_DEPTH = 5; // -2,-1,0,1,2
     for (var z = -(SPLAT_DEPTH - 1) / 2; z <= (SPLAT_DEPTH - 1) / 2; ++z) {
       transferToGridDrawState.uniform1f('u_zOffset', z);
       wgl.drawArrays(transferToGridDrawState, wgl.POINTS, 0, this.particlesWidth * this.particlesHeight);

@@ -103,7 +103,7 @@ class MAC {
       offset = [0.05, 0.02];
     } else if (type === 'dam-middle') {
       scene = 0;
-      offset = [0.25, 0.05];
+      offset = [0.25, 0.0];
     } else if (type === 'dam-leftmost') {
       scene = 0;
       offset = [0.0, 0.0];
@@ -314,15 +314,15 @@ class MAC {
   }
 
   substep(deltaT) {
-    this.moveMarkers(deltaT);
-    this.markCells();
-    this.applyExternalForces(deltaT);
-    this.applyBoundaryCondAndMarkValid();
-    this.extrapolate();
-    this.advectVelocity(deltaT);
-    this.buildSystem();
-    this.poissonSolver.solve(this.systemFb, this.pressureFbs);
-    return this.applyPressure();
+    // this.moveMarkers(deltaT);
+    // this.markCells();
+    // this.applyExternalForces(deltaT);
+    // this.applyBoundaryCondAndMarkValid();
+    // this.extrapolate();
+    // this.advectVelocity(deltaT);
+    // this.buildSystem();
+    // this.poissonSolver.solve(this.systemFb, this.pressureFbs);
+    // return this.applyPressure();
   }
 
   animate() {
@@ -543,7 +543,7 @@ class PoissonSolver {
 function initialize() {
   window.settings = {
     flipBlending: 0.8,
-    initialState: "dam-left",
+    initialState: "dam-middle",
     iterations: 5,
     jacobiDamping: 0.67,
     method: "pic",

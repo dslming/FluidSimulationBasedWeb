@@ -24,17 +24,20 @@ void main () {
     gl_PointSize = 5.0;
 
     vec3 position = texture2D(u_positionTexture, a_textureCoordinates).rgb;
+    // 网格空间
     position = (position / u_gridSize) * u_gridResolution;
 
     vec3 velocity = texture2D(u_velocityTexture, a_textureCoordinates).rgb;
     v_velocity = velocity;
     v_position = position;
 
+    // 向下取整
     vec3 cellIndex = vec3(floor(position.xyz));
     //offset into the right layer
     // 偏移到正确的层
     v_zIndex = cellIndex.z + u_zOffset;
 
+    // 在网格的中心(x,y)
     float x = v_zIndex * (u_gridResolution.x + 1.0) + cellIndex.x + 0.5;
     float y = cellIndex.y + 0.5;
 
@@ -43,5 +46,6 @@ void main () {
         u_gridResolution.y + 1.0
     );
     vec2 textureCoordinates = vec2(x,y) / temp;
+    // -1 ~ 1
     gl_Position = vec4(textureCoordinates * 2.0 - 1.0, 0.0, 1.0);
 }

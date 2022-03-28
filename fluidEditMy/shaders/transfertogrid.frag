@@ -30,6 +30,7 @@ float k (vec3 v) {
 }
 
 void main () {
+    // 屏幕空间的位置
     vec3 cellIndex = floor(get3DFragCoord(u_gridResolution + 1.0));
 
     //make sure we're in the right slice to prevent bleeding
