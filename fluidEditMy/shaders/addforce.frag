@@ -26,7 +26,8 @@ float kernel (vec3 position, float radius) {
 void main () {
     vec3 velocity = texture2D(u_velocityTexture, v_coordinates).rgb;
 
-    vec3 newVelocity = velocity + vec3(0.0, -40.0 * u_timeStep, 0.0); //add gravity
+    // add gravity
+    vec3 newVelocity = velocity + vec3(0.0, -40.0 * u_timeStep, 0.0);
 
     vec3 cellIndex = floor(get3DFragCoord(u_gridResolution + 1.0));
     vec3 xPosition = vec3(cellIndex.x, cellIndex.y + 0.5, cellIndex.z + 0.5);

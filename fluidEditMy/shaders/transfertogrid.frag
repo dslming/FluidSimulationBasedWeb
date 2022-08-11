@@ -4,7 +4,8 @@
 
 //needs a division as a second step
 
-varying vec3 v_position; //already in the grid coordinate system
+//already in the grid coordinate system
+varying vec3 v_position;
 varying vec3 v_velocity;
 
 uniform vec3 u_gridResolution;
